@@ -12,6 +12,7 @@ public partial class MainWindow
     public MainWindow(
         MainWindowViewModel viewModel,
         INavigationViewPageProvider pageProvider,
+        INavigationService navigationService,
         ISnackbarService snackbarService,
         IContentDialogService contentDialogService)
     {
@@ -22,6 +23,7 @@ public partial class MainWindow
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         contentDialogService.SetDialogHost(RootContentDialog);
         RootNavigation.SetPageProviderService(pageProvider);
+        navigationService.SetNavigationControl(RootNavigation);
 
         Loaded += (_, _) => RootNavigation.Navigate(typeof(DashboardPage));
     }

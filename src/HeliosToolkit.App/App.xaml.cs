@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using HeliosToolkit.App.Services;
+using HeliosToolkit.App.Services.Hardware;
 using HeliosToolkit.App.ViewModels;
 using HeliosToolkit.App.Views;
 using HeliosToolkit.App.Views.Pages;
@@ -30,8 +31,13 @@ public partial class App
             services.AddSingleton<MainWindow>();
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<INavigationViewPageProvider, NavigationPageProvider>();
+            services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<ISnackbarService, SnackbarService>();
             services.AddSingleton<IContentDialogService, ContentDialogService>();
+
+            // Hardware / system info
+            services.AddSingleton<WmiQueryService>();
+            services.AddSingleton<SystemInfoService>();
 
             // Pages + view models (singletons: NavigationView keeps page state alive)
             services.AddSingleton<DashboardPage>();
