@@ -1,0 +1,37 @@
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Predator-style palette -->
+  <Color x:Key="PredatorAccentColor">#00E5D1</Color>
+  <Color x:Key="PredatorBackgroundColor">#0B0E11</Color>
+
+  <SolidColorBrush x:Key="PredatorAccentBrush" Color="{StaticResource PredatorAccentColor}" />
+  <SolidColorBrush x:Key="PredatorBackgroundBrush" Color="{StaticResource PredatorBackgroundColor}" />
+
+  <!-- Risk badge colors -->
+  <SolidColorBrush x:Key="RiskSafeBrush" Color="#1E9E5A" />
+  <SolidColorBrush x:Key="RiskSituationalBrush" Color="#C28A1D" />
+  <SolidColorBrush x:Key="RiskRiskyBrush" Color="#C2403D" />
+  <SolidColorBrush x:Key="RiskInfoBrush" Color="#3D7BC2" />
+
+  <!-- Shared text styles -->
+  <Style x:Key="PageTitleTextStyle" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="26" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+  </Style>
+
+  <Style x:Key="PageSubtitleTextStyle" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+
+  <Style x:Key="CardTitleTextStyle" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+  </Style>
+
+</ResourceDictionary>

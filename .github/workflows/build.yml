@@ -1,0 +1,96 @@
+name: Build
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  test:
+    name: Unit tests (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Test
+        run: dotnet test tests/HeliosToolkit.Core.Tests -c Release
+
+  linux-compile-check:
+    name: Cross-compile check (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Publish win-x64 (compile check only)
+        run: >
+          dotnet publish src/HeliosToolkit.App -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+
+  build-windows:
+    name: Build EXE (Windows)
+    runs-on: windows-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Determine version
+        id: version
+        shell: pwsh
+        run: |
+          $version = "0.0.0-ci.${{ github.run_number }}"
+          if ("${{ github.ref }}".StartsWith("refs/tags/v")) {
+            $version = "${{ github.ref_name }}".TrimStart("v")
+          }
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - name: Publish
+        shell: pwsh
+        run: >
+          dotnet publish src/HeliosToolkit.App -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:Version=${{ steps.version.outputs.version }}
+          -o publish
+      - name: Hash
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash publish/HeliosToolkit.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  HeliosToolkit.exe" | Out-File -Encoding ascii publish/HeliosToolkit.exe.sha256
+          Get-Content publish/HeliosToolkit.exe.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HeliosToolkit-${{ steps.version.outputs.version }}
+          path: |
+            publish/HeliosToolkit.exe
+            publish/HeliosToolkit.exe.sha256
+
+  release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-windows
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: publish
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            publish/HeliosToolkit.exe
+            publish/HeliosToolkit.exe.sha256
+          generate_release_notes: true

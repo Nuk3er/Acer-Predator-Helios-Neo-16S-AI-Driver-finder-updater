@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Helios Neo Toolkit icon: angular "H" monogram, Predator cyan on near-black -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="#0B0E11"/>
+  <rect x="28" y="28" width="456" height="456" rx="86" fill="none" stroke="#00E5D1" stroke-width="10" opacity="0.28"/>
+
+  <!-- Left bar with chamfered outer corners -->
+  <path d="M120 140 L150 110 L196 110 L196 402 L150 402 L120 372 Z" fill="#00E5D1"/>
+  <!-- Right bar with chamfered outer corners -->
+  <path d="M392 140 L362 110 L316 110 L316 402 L362 402 L392 372 Z" fill="#00E5D1"/>
+  <!-- Crossbar with notch -->
+  <path d="M196 226 L316 226 L316 286 L196 286 Z" fill="#00E5D1"/>
+
+  <!-- Accent slashes -->
+  <path d="M226 330 L286 330 L266 354 L246 354 Z" fill="#00E5D1" opacity="0.55"/>
+</svg>

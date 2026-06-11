@@ -1,0 +1,84 @@
+<ui:FluentWindow
+  x:Class="HeliosToolkit.App.Views.MainWindow"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  xmlns:pages="clr-namespace:HeliosToolkit.App.Views.Pages"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  Title="Helios Neo Toolkit"
+  Width="1280"
+  Height="820"
+  MinWidth="1080"
+  MinHeight="700"
+  d:DesignHeight="820"
+  d:DesignWidth="1280"
+  ExtendsContentIntoTitleBar="True"
+  WindowBackdropType="Mica"
+  WindowCornerPreference="Round"
+  WindowStartupLocation="CenterScreen">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <ui:TitleBar
+      Grid.Row="0"
+      Title="HELIOS NEO TOOLKIT — PHN16S-71"
+      CloseWindowByDoubleClickOnIcon="True">
+      <ui:TitleBar.Icon>
+        <ui:ImageIcon Source="pack://application:,,,/Resources/icon.ico" />
+      </ui:TitleBar.Icon>
+    </ui:TitleBar>
+
+    <ui:NavigationView
+      x:Name="RootNavigation"
+      Grid.Row="1"
+      IsBackButtonVisible="Collapsed"
+      IsPaneToggleVisible="False"
+      OpenPaneLength="225"
+      PaneDisplayMode="Left">
+
+      <ui:NavigationView.MenuItems>
+        <ui:NavigationViewItem
+          Content="Dashboard"
+          Icon="{ui:SymbolIcon Gauge24}"
+          TargetPageType="{x:Type pages:DashboardPage}" />
+        <ui:NavigationViewItem
+          Content="Devices &amp; Drivers"
+          Icon="{ui:SymbolIcon DeveloperBoard24}"
+          TargetPageType="{x:Type pages:DevicesPage}" />
+        <ui:NavigationViewItem
+          Content="NVIDIA"
+          Icon="{ui:SymbolIcon Rocket24}"
+          TargetPageType="{x:Type pages:NvidiaPage}" />
+        <ui:NavigationViewItem
+          Content="Windows Tweaks"
+          Icon="{ui:SymbolIcon Options24}"
+          TargetPageType="{x:Type pages:WindowsTweaksPage}" />
+        <ui:NavigationViewItem
+          Content="Backup &amp; Profiles"
+          Icon="{ui:SymbolIcon ShieldCheckmark24}"
+          TargetPageType="{x:Type pages:BackupPage}" />
+      </ui:NavigationView.MenuItems>
+
+      <ui:NavigationView.FooterMenuItems>
+        <ui:NavigationViewItem
+          Content="Settings"
+          Icon="{ui:SymbolIcon Settings24}"
+          TargetPageType="{x:Type pages:SettingsPage}" />
+      </ui:NavigationView.FooterMenuItems>
+    </ui:NavigationView>
+
+    <ui:ContentDialogHost x:Name="RootContentDialog" Grid.Row="0" Grid.RowSpan="2" />
+
+    <ui:SnackbarPresenter
+      x:Name="SnackbarPresenter"
+      Grid.Row="1"
+      Margin="0,0,0,12"
+      VerticalAlignment="Bottom" />
+  </Grid>
+</ui:FluentWindow>
