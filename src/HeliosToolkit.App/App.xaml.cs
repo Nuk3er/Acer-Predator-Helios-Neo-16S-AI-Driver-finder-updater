@@ -5,6 +5,9 @@ using System.Windows.Threading;
 using HeliosToolkit.App.Services;
 using HeliosToolkit.App.Services.Drivers;
 using HeliosToolkit.App.Services.Hardware;
+using HeliosToolkit.App.Services.Safety;
+using HeliosToolkit.App.Services.System;
+using HeliosToolkit.App.Services.Tweaks;
 using HeliosToolkit.App.ViewModels;
 using HeliosToolkit.App.Views;
 using HeliosToolkit.App.Views.Pages;
@@ -55,6 +58,13 @@ public partial class App
             services.AddSingleton<DriverStatusService>();
             services.AddSingleton<DownloadService>();
             services.AddSingleton<DriverHealthState>();
+
+            // Tweak engine & safety
+            services.AddSingleton<TimerResolutionService>();
+            services.AddSingleton<TweakCatalog>();
+            services.AddSingleton<BackupStore>();
+            services.AddSingleton<RestorePointService>();
+            services.AddSingleton<TweakEngine>();
 
             // Pages + view models (singletons: NavigationView keeps page state alive)
             services.AddSingleton<DashboardPage>();

@@ -1,5 +1,12 @@
 namespace HeliosToolkit.Core.Tweaks;
 
+/// <summary>Which page of the app a tweak lives on.</summary>
+public enum TweakPage
+{
+    Nvidia,
+    Windows,
+}
+
 /// <summary>
 /// Static description of a tweak. Pure data so the catalog can be sanity-checked by unit tests.
 /// </summary>
@@ -8,6 +15,8 @@ public sealed record TweakMetadata
     public required string Id { get; init; }
 
     public required string Name { get; init; }
+
+    public required TweakPage Page { get; init; }
 
     /// <summary>Group header shown in the UI, e.g. "GPU", "Power", "Input", "Network".</summary>
     public required string Category { get; init; }

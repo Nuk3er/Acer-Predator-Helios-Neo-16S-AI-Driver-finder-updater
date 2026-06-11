@@ -3,30 +3,55 @@
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  xmlns:controls="clr-namespace:HeliosToolkit.App.Views.Controls"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   mc:Ignorable="d"
-  d:DesignHeight="700"
+  d:DesignHeight="800"
   d:DesignWidth="1100"
   Title="NVIDIA"
   Foreground="{DynamicResource TextFillColorPrimaryBrush}">
 
-  <Grid Margin="32,24">
+  <Page.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
+  </Page.Resources>
+
+  <Grid Margin="32,24,20,0">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <StackPanel Grid.Row="0">
-      <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="NVIDIA" />
-      <TextBlock
-        Margin="0,4,0,0"
-        Style="{StaticResource PageSubtitleTextStyle}"
-        Text="GPU driver tweaks, performance profile and driver debloating." />
-    </StackPanel>
+    <Grid Grid.Row="0" Margin="0,0,12,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <StackPanel Grid.Column="0">
+        <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="NVIDIA" />
+        <TextBlock
+          Margin="0,4,0,0"
+          Style="{StaticResource PageSubtitleTextStyle}"
+          Text="GPU driver tweaks for your RTX 50-series laptop. The driver performance profile and the debloat helper arrive next." />
+      </StackPanel>
+      <ui:Button
+        Grid.Column="1"
+        VerticalAlignment="Top"
+        Command="{Binding ViewModel.LoadCommand}"
+        Content="Re-detect"
+        Icon="{ui:SymbolIcon ArrowClockwise24}" />
+    </Grid>
 
-    <ui:Card Grid.Row="1" Margin="0,20,0,0" VerticalAlignment="Top">
-      <TextBlock Style="{StaticResource PageSubtitleTextStyle}" Text="NVIDIA tweaks arrive in a later milestone." />
-    </ui:Card>
+    <Grid Grid.Row="1" Margin="0,14,0,0">
+      <ui:ProgressRing
+        VerticalAlignment="Top"
+        HorizontalAlignment="Center"
+        Margin="0,30,0,0"
+        IsIndeterminate="True"
+        Visibility="{Binding ViewModel.IsLoading, Converter={StaticResource BoolToVis}}" />
+      <ScrollViewer Padding="0,0,12,24" VerticalScrollBarVisibility="Auto">
+        <controls:TweakListView DataContext="{Binding ViewModel.GroupedTweaks}" />
+      </ScrollViewer>
+    </Grid>
   </Grid>
 </Page>
