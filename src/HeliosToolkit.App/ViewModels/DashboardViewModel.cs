@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using HeliosToolkit.App.Services.Drivers;
 using HeliosToolkit.App.Services.Hardware;
 using HeliosToolkit.App.Views.Pages;
 using Serilog;
@@ -18,10 +19,13 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty]
     private SystemSnapshot? _snapshot;
 
-    public DashboardViewModel(SystemInfoService systemInfo, INavigationService navigation)
+    public DriverHealthState Health { get; }
+
+    public DashboardViewModel(SystemInfoService systemInfo, INavigationService navigation, DriverHealthState health)
     {
         _systemInfo = systemInfo;
         _navigation = navigation;
+        Health = health;
         _ = LoadAsync(refresh: false);
     }
 

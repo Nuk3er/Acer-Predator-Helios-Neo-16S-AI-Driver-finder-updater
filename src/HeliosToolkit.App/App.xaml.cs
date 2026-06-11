@@ -1,7 +1,9 @@
 using System.IO;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Threading;
 using HeliosToolkit.App.Services;
+using HeliosToolkit.App.Services.Drivers;
 using HeliosToolkit.App.Services.Hardware;
 using HeliosToolkit.App.ViewModels;
 using HeliosToolkit.App.Views;
@@ -38,6 +40,21 @@ public partial class App
             // Hardware / system info
             services.AddSingleton<WmiQueryService>();
             services.AddSingleton<SystemInfoService>();
+            services.AddSingleton<DeviceInventoryService>();
+
+            // Drivers
+            services.AddSingleton(_ =>
+            {
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                    $"HeliosToolkit/{typeof(App).Assembly.GetName().Version?.ToString(3) ?? "0.0.0"}");
+                return client;
+            });
+            services.AddSingleton<ManifestService>();
+            services.AddSingleton<NvidiaDriverApiClient>();
+            services.AddSingleton<DriverStatusService>();
+            services.AddSingleton<DownloadService>();
+            services.AddSingleton<DriverHealthState>();
 
             // Pages + view models (singletons: NavigationView keeps page state alive)
             services.AddSingleton<DashboardPage>();

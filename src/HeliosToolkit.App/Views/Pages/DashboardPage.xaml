@@ -95,12 +95,22 @@
               <ColumnDefinition Width="*" />
               <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-              <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Driver health" />
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
               <TextBlock
-                Margin="0,4,0,0"
-                Style="{StaticResource CardHintTextStyle}"
-                Text="Run a device scan to find broken devices and outdated drivers." />
+                Margin="0,0,18,0"
+                VerticalAlignment="Center"
+                FontSize="40"
+                FontWeight="Bold"
+                Foreground="{StaticResource PredatorAccentBrush}"
+                Text="{Binding ViewModel.Health.ScoreText, Mode=OneWay}" />
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Driver health" />
+                <TextBlock
+                  Margin="0,4,0,0"
+                  MaxWidth="420"
+                  Style="{StaticResource CardHintTextStyle}"
+                  Text="{Binding ViewModel.Health.Summary, Mode=OneWay}" />
+              </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
               <ui:Button

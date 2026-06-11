@@ -31,6 +31,11 @@
 
   <ItemGroup>
     <Resource Include="Resources/icon.ico" />
+    <!-- Offline fallback copy of the curated driver manifest -->
+    <EmbeddedResource
+      Include="../../manifest/drivers.manifest.json"
+      Link="Resources/drivers.manifest.json"
+      LogicalName="HeliosToolkit.App.Resources.drivers.manifest.json" />
   </ItemGroup>
 
 </Project>
