@@ -56,18 +56,20 @@ self-contained file, nothing to install.
 
 ## 🗺️ Roadmap
 
-Planned for future releases, roughly in order:
-
-- [ ] **NVIDIA driver-profile automation** — apply *Prefer maximum performance* / *Low Latency
-      Ultra* / V-Sync off directly through NVAPI once the interop is validated on RTX 50
-      drivers (today the app shows the recommended settings to set by hand).
+- [x] **Driver fixing via Windows Update** *(v0.2.0)* — finds drivers for problem devices,
+      multiselect, silent install, plus per-device Microsoft Update Catalog links and a
+      pnputil "install from folder" for manual downloads.
+- [x] **NVIDIA driver-profile automation** *(v0.2.0)* — one-click NVAPI bundle: Prefer maximum
+      performance, threaded optimization, V-Sync off, pre-rendered frames 1, texture filtering
+      high-performance. Fully revertible; degrades gracefully if NVAPI refuses.
+- [x] **CPU & SSD tweak pack** *(v0.2.0)* — min processor state, EPP performance bias, C-state
+      control (risky, labeled), NVMe idle, NTFS last-access/8.3, TRIM check.
+- [x] **Tray mode** *(v0.2.0)* — minimize to tray; the 0.5 ms timer hold keeps running.
+- [x] **In-app auto-update** *(v0.2.0)* — download & swap new releases from Settings.
 - [ ] **Acer support-page integration** — auto-fill "latest version" in the driver manifest from
-      Acer's official PHN16S-71 download listings.
-- [ ] **Windows Update Catalog lookup** — find drivers for *any* problem device by hardware ID.
+      Acer's official PHN16S-71 download listings (planned as a repo-side updater action).
 - [ ] **Before/after benchmark helper** — PresentMon-based FPS + frame-time capture so every
       tweak can be measured instead of guessed.
-- [ ] **Tray mode** — minimize to tray, hold timer resolution while gaming, quick profile switch.
-- [ ] **In-app auto-update** — download & swap new releases from inside the app.
 - [ ] **Code signing** — no more SmartScreen warning.
 - [ ] **More Predator models** — additional curated manifests (Helios 16/18, Neo 14…).
 - [ ] **Localization** — German and more.

@@ -9,6 +9,7 @@ namespace HeliosToolkit.App.Views;
 public partial class MainWindow
 {
     private readonly OnboardingService _onboarding;
+    private readonly TrayService _tray;
 
     public MainWindowViewModel ViewModel { get; }
 
@@ -18,10 +19,12 @@ public partial class MainWindow
         INavigationService navigationService,
         ISnackbarService snackbarService,
         IContentDialogService contentDialogService,
-        OnboardingService onboarding)
+        OnboardingService onboarding,
+        TrayService tray)
     {
         ViewModel = viewModel;
         _onboarding = onboarding;
+        _tray = tray;
         DataContext = this;
         InitializeComponent();
 
@@ -30,6 +33,8 @@ public partial class MainWindow
         RootNavigation.SetPageProviderService(pageProvider);
         navigationService.SetNavigationControl(RootNavigation);
 
+        _tray.Attach(this);
+        Closed += (_, _) => _tray.Dispose();
         Loaded += OnLoaded;
     }
 

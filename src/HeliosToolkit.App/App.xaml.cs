@@ -61,6 +61,9 @@ public partial class App
             services.AddSingleton<DownloadService>();
             services.AddSingleton<DriverHealthState>();
             services.AddSingleton<NvidiaPackageDebloater>();
+            services.AddSingleton<WindowsUpdateDriverService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Nvidia.NvApiDrs>();
+            services.AddSingleton<TrayService>();
 
             // Tweak engine & safety
             services.AddSingleton<TimerResolutionService>();

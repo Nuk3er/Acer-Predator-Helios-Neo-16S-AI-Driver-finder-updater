@@ -38,10 +38,33 @@ public static partial class PowerCfg
         string scheme, string subgroup, string setting, long value, CancellationToken ct = default) =>
         ProcessRunner.RunAsync("powercfg", $"-setacvalueindex {scheme} {subgroup} {setting} {value}", ct);
 
-    /// <summary>Reads the AC index for a setting from "powercfg /query" output.</summary>
+    /// <summary>
+    /// Reads the AC index for a setting on the active scheme. Reads the registry first —
+    /// unlike "powercfg /query", that also works for hidden settings (boost mode, core
+    /// parking, EPP…) and is locale-independent. Null ⇒ not explicitly set (inherited default).
+    /// </summary>
     public static async Task<long?> GetAcValueIndexAsync(
         string scheme, string subgroup, string setting, CancellationToken ct = default)
     {
+        string? activeGuid = GetActiveSchemeGuidFromRegistry();
+        if (activeGuid is not null)
+        {
+            object? index = Tweaks.RegistryHelper.ReadValue(
+                "HKLM",
+                $@"SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\{activeGuid}\{subgroup}\{setting}",
+                "ACSettingIndex");
+            if (index is int i)
+            {
+                return i;
+            }
+
+            if (index is long l)
+            {
+                return l;
+            }
+        }
+
+        // Fallback for non-hidden settings.
         ProcessResult r = await ProcessRunner.RunAsync("powercfg", $"/query {scheme} {subgroup} {setting}", ct);
         Match m = AcIndexRegex().Match(r.StdOut);
         if (m.Success && long.TryParse(
@@ -51,6 +74,31 @@ public static partial class PowerCfg
         }
 
         return null;
+    }
+
+    /// <summary>Active scheme GUID straight from the registry (locale-proof, no process spawn).</summary>
+    public static string? GetActiveSchemeGuidFromRegistry()
+    {
+        object? value = Tweaks.RegistryHelper.ReadValue(
+            "HKLM", @"SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes", "ActivePowerScheme");
+        string? guid = value?.ToString();
+        return string.IsNullOrWhiteSpace(guid) ? null : guid;
+    }
+
+    /// <summary>
+    /// Removes an explicit per-scheme value so the setting falls back to the scheme default
+    /// (powercfg has no way to "unset"). Used when reverting a tweak that wasn't set before.
+    /// </summary>
+    public static void DeleteAcValue(string subgroup, string setting)
+    {
+        string? activeGuid = GetActiveSchemeGuidFromRegistry();
+        if (activeGuid is null)
+        {
+            return;
+        }
+
+        string key = $@"SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\{activeGuid}\{subgroup}\{setting}";
+        Tweaks.RegistryHelper.DeleteValue("HKLM", key, "ACSettingIndex");
     }
 
     public static Task<ProcessResult> SetHibernateAsync(bool on, CancellationToken ct = default) =>

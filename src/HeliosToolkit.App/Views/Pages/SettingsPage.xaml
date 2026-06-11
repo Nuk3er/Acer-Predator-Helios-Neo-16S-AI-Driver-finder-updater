@@ -50,6 +50,13 @@
                 Content="Refresh driver manifest"
                 Icon="{ui:SymbolIcon ArrowSync24}" />
               <ui:Button
+                Margin="0,0,8,0"
+                Appearance="Primary"
+                Command="{Binding ViewModel.InstallUpdateCommand}"
+                Content="Install update now"
+                Icon="{ui:SymbolIcon ArrowCircleUp24}"
+                Visibility="{Binding ViewModel.CanInstallUpdate, Converter={StaticResource BoolToVis}}" />
+              <ui:Button
                 Command="{Binding ViewModel.OpenUpdateUrlCommand}"
                 Content="Open release"
                 Icon="{ui:SymbolIcon Open24}"
