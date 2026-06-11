@@ -28,11 +28,18 @@ labeled by risk and fully reversible.
 
 ## Download
 
-Grab `HeliosToolkit.exe` from the [Releases](../../releases) page.
+**Direct download (latest build, v0.1.0):**
+[`release/HeliosToolkit.exe`](release/HeliosToolkit.exe) — open the file and click the
+**download icon** ("Download raw file"). Verify it against
+[`release/HeliosToolkit.exe.sha256`](release/HeliosToolkit.exe.sha256) if you want to be sure
+(PowerShell: `Get-FileHash HeliosToolkit.exe`).
+
+**Releases page:** once GitHub Actions is enabled for this account, every `v*` tag
+automatically builds the EXE on a Windows runner and attaches it to
+[Releases](../../releases) — that's the preferred download spot going forward.
 
 The EXE is unsigned, so Windows SmartScreen will warn on first run:
-click **More info → Run anyway**. Verify the SHA-256 against the
-`HeliosToolkit.exe.sha256` file attached to the release if you want to be sure.
+click **More info → Run anyway**.
 
 The app requires administrator rights (registry, services, power plans and driver work).
 
