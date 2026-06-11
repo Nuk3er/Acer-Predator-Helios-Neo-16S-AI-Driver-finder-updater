@@ -20,8 +20,13 @@ the Acer Predator Helios Neo 16S AI (PHN16S-71)**
 
 ## 📥 Download
 
-Grab **`HeliosToolkit.exe`** from the **[latest release](../../releases/latest)** — a single
-self-contained file, nothing to install.
+**Current build (v0.2.0):** [`release/HeliosToolkit.exe`](release/HeliosToolkit.exe) — open it
+and click **Download raw file**. Single self-contained EXE, nothing to install.
+Checksum: [`release/HeliosToolkit.exe.sha256`](release/HeliosToolkit.exe.sha256).
+
+Once GitHub Actions runs on this account, tagged builds publish automatically to the
+**[Releases page](../../releases/latest)**, which then becomes the preferred download
+(and what the in-app updater watches).
 
 - The EXE is unsigned, so SmartScreen warns on first run: **More info → Run anyway.**
   Each release ships a `HeliosToolkit.exe.sha256` you can verify with `Get-FileHash`.
