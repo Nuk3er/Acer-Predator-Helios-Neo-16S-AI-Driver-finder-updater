@@ -1,0 +1,125 @@
+<Page
+  x:Class="HeliosToolkit.App.Views.Pages.BackupPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DesignHeight="760"
+  d:DesignWidth="1100"
+  Title="Backup &amp; Profiles"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+
+  <Page.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
+  </Page.Resources>
+
+  <Grid Margin="32,24,20,0">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0">
+      <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="Backup &amp; Profiles" />
+      <TextBlock
+        Margin="0,4,0,0"
+        Style="{StaticResource PageSubtitleTextStyle}"
+        Text="Your safety net. Every tweak is backed up before it changes anything; you can undo all of it here." />
+    </StackPanel>
+
+    <ScrollViewer Grid.Row="1" Margin="0,18,0,0" Padding="0,0,12,24" VerticalScrollBarVisibility="Auto">
+      <StackPanel>
+
+        <ui:Card Margin="0,0,0,12" Padding="20">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+              <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Revert everything" />
+              <TextBlock
+                Margin="0,4,0,0"
+                Style="{StaticResource PageSubtitleTextStyle}"
+                Text="{Binding ViewModel.BackedUpSummary, Mode=OneWay}" />
+            </StackPanel>
+            <ui:Button
+              Grid.Column="1"
+              VerticalAlignment="Center"
+              Appearance="Danger"
+              Command="{Binding ViewModel.RevertEverythingCommand}"
+              Content="Revert all tweaks"
+              Icon="{ui:SymbolIcon ArrowUndo24}"
+              IsEnabled="{Binding ViewModel.HasBackups}" />
+          </Grid>
+        </ui:Card>
+
+        <ui:Card Margin="0,0,0,12" Padding="20">
+          <StackPanel>
+            <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="System Restore point" />
+            <TextBlock
+              Margin="0,4,0,12"
+              Style="{StaticResource PageSubtitleTextStyle}"
+              Text="Helios creates one automatically before the first tweak of a session. You can also make one now." />
+            <ui:Button
+              HorizontalAlignment="Left"
+              Command="{Binding ViewModel.CreateRestorePointCommand}"
+              Content="Create restore point now"
+              Icon="{ui:SymbolIcon ShieldCheckmark24}" />
+          </StackPanel>
+        </ui:Card>
+
+        <ui:Card Margin="0,0,0,12" Padding="20">
+          <StackPanel>
+            <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Tweak profiles" />
+            <TextBlock
+              Margin="0,4,0,12"
+              Style="{StaticResource PageSubtitleTextStyle}"
+              Text="Save your current on/off tweak set to a file, or apply a saved one. Importing applies each tweak through the same backup pipeline." />
+            <StackPanel Orientation="Horizontal">
+              <ui:Button
+                Margin="0,0,8,0"
+                Command="{Binding ViewModel.ExportProfileCommand}"
+                Content="Export profile"
+                Icon="{ui:SymbolIcon Save24}" />
+              <ui:Button
+                Command="{Binding ViewModel.ImportProfileCommand}"
+                Content="Import profile"
+                Icon="{ui:SymbolIcon FolderOpen24}" />
+            </StackPanel>
+          </StackPanel>
+        </ui:Card>
+
+        <ui:Card Padding="20">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+              <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Backup files" />
+              <TextBlock
+                Margin="0,4,0,0"
+                Style="{StaticResource PageSubtitleTextStyle}"
+                Text="{Binding ViewModel.BackupFolder, Mode=OneWay}" />
+            </StackPanel>
+            <ui:Button
+              Grid.Column="1"
+              VerticalAlignment="Center"
+              Command="{Binding ViewModel.OpenBackupFolderCommand}"
+              Content="Open folder"
+              Icon="{ui:SymbolIcon FolderOpen24}" />
+          </Grid>
+        </ui:Card>
+
+        <ui:ProgressRing
+          Margin="0,16,0,0"
+          HorizontalAlignment="Center"
+          IsIndeterminate="True"
+          Visibility="{Binding ViewModel.IsBusy, Converter={StaticResource BoolToVis}}" />
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</Page>

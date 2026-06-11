@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>HeliosToolkit.App</RootNamespace>
+    <AssemblyName>HeliosToolkit</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Resources/icon.ico</ApplicationIcon>
+    <!-- Allows compiling the Windows-targeted app from Linux/macOS (CI compile checks). -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <AssemblyTitle>Helios Neo Toolkit</AssemblyTitle>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageReference Include="System.Management" Version="9.0.0" />
+    <PackageReference Include="SevenZipExtractor" Version="1.0.19" NoWarn="NU1701" GeneratePathProperty="true" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../HeliosToolkit.Core/HeliosToolkit.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources/icon.ico" />
+    <!-- Offline fallback copy of the curated driver manifest -->
+    <EmbeddedResource
+      Include="../../manifest/drivers.manifest.json"
+      Link="Resources/drivers.manifest.json"
+      LogicalName="HeliosToolkit.App.Resources.drivers.manifest.json" />
+    <!-- Embed the native 7-Zip library so the single-file EXE can extract NVIDIA driver packages -->
+    <EmbeddedResource Include="$(PkgSevenZipExtractor)\build\x64\7z.dll" Condition="Exists('$(PkgSevenZipExtractor)\build\x64\7z.dll')">
+      <LogicalName>HeliosToolkit.App.Native.7z.dll</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

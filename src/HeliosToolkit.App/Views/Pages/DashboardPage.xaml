@@ -1,0 +1,214 @@
+<Page
+  x:Class="HeliosToolkit.App.Views.Pages.DashboardPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DesignHeight="760"
+  d:DesignWidth="1100"
+  Title="Dashboard"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+
+  <Page.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+    <Style x:Key="InfoCardStyle" TargetType="ui:Card" BasedOn="{StaticResource {x:Type ui:Card}}">
+      <Setter Property="Margin" Value="0,0,12,12" />
+      <Setter Property="Padding" Value="16" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="Width" Value="330" />
+    </Style>
+
+    <Style x:Key="CardValueTextStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+
+    <Style x:Key="CardHintTextStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+
+    <Style x:Key="CardHeaderPanelStyle" TargetType="StackPanel">
+      <Setter Property="Orientation" Value="Horizontal" />
+      <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+  </Page.Resources>
+
+  <Grid Margin="32,24,20,0">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Header -->
+    <Grid Grid.Row="0" Margin="0,0,12,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <StackPanel Grid.Column="0">
+        <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="Dashboard" />
+        <TextBlock
+          Margin="0,4,0,0"
+          Style="{StaticResource PageSubtitleTextStyle}"
+          Text="System overview for your Predator Helios Neo 16S AI." />
+      </StackPanel>
+      <ui:Button
+        Grid.Column="1"
+        VerticalAlignment="Top"
+        Command="{Binding ViewModel.RefreshCommand}"
+        Content="Refresh"
+        Icon="{ui:SymbolIcon ArrowClockwise24}" />
+    </Grid>
+
+    <!-- Model banner -->
+    <StackPanel Grid.Row="1" Margin="0,12,12,0">
+      <ui:InfoBar
+        Title="Model verified"
+        IsClosable="False"
+        IsOpen="{Binding ViewModel.ShowModelVerified, Mode=OneWay}"
+        Message="This is a Predator Helios Neo 16S AI (PHN16S-71) — all curated driver data applies."
+        Severity="Success" />
+      <ui:InfoBar
+        Title="Different model detected"
+        IsClosable="False"
+        IsOpen="{Binding ViewModel.ShowModelWarning, Mode=OneWay}"
+        Message="{Binding ViewModel.ModelWarningText, Mode=OneWay}"
+        Severity="Warning" />
+    </StackPanel>
+
+    <ScrollViewer Grid.Row="2" Margin="0,16,0,0" Padding="0,0,12,24" VerticalScrollBarVisibility="Auto">
+      <StackPanel>
+
+        <!-- Health / quick actions hero card -->
+        <ui:Card Margin="0,0,12,12" Padding="20">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+              <TextBlock
+                Margin="0,0,18,0"
+                VerticalAlignment="Center"
+                FontSize="40"
+                FontWeight="Bold"
+                Foreground="{StaticResource PredatorAccentBrush}"
+                Text="{Binding ViewModel.Health.ScoreText, Mode=OneWay}" />
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Driver health" />
+                <TextBlock
+                  Margin="0,4,0,0"
+                  MaxWidth="420"
+                  Style="{StaticResource CardHintTextStyle}"
+                  Text="{Binding ViewModel.Health.Summary, Mode=OneWay}" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+              <ui:Button
+                Margin="0,0,8,0"
+                Appearance="Primary"
+                Command="{Binding ViewModel.OpenDevicesCommand}"
+                Content="Scan devices &amp; drivers"
+                Icon="{ui:SymbolIcon Search24}" />
+              <ui:Button
+                Margin="0,0,8,0"
+                Command="{Binding ViewModel.OpenNvidiaCommand}"
+                Content="NVIDIA"
+                Icon="{ui:SymbolIcon Rocket24}" />
+              <ui:Button
+                Command="{Binding ViewModel.OpenTweaksCommand}"
+                Content="Windows tweaks"
+                Icon="{ui:SymbolIcon Options24}" />
+            </StackPanel>
+          </Grid>
+        </ui:Card>
+
+        <ui:ProgressRing
+          Margin="0,24,0,24"
+          HorizontalAlignment="Center"
+          IsIndeterminate="True"
+          Visibility="{Binding ViewModel.IsLoading, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Info cards -->
+        <WrapPanel>
+          <ui:Card Style="{StaticResource InfoCardStyle}">
+            <StackPanel>
+              <StackPanel Style="{StaticResource CardHeaderPanelStyle}">
+                <ui:SymbolIcon FontSize="18" Foreground="{StaticResource PredatorAccentBrush}" Symbol="Laptop24" />
+                <TextBlock Margin="8,0,0,0" Style="{StaticResource CardTitleTextStyle}" Text="System" />
+              </StackPanel>
+              <TextBlock Style="{StaticResource CardValueTextStyle}" Text="{Binding ViewModel.ModelLine, Mode=OneWay}" />
+              <TextBlock Style="{StaticResource CardHintTextStyle}" Text="{Binding ViewModel.FamilyLine, Mode=OneWay}" />
+              <TextBlock Style="{StaticResource CardHintTextStyle}" Text="{Binding ViewModel.BiosLine, Mode=OneWay}" />
+              <TextBlock Style="{StaticResource CardHintTextStyle}" Text="{Binding ViewModel.SerialLine, Mode=OneWay}" />
+            </StackPanel>
+          </ui:Card>
+
+          <ui:Card Style="{StaticResource InfoCardStyle}">
+            <StackPanel>
+              <StackPanel Style="{StaticResource CardHeaderPanelStyle}">
+                <ui:SymbolIcon FontSize="18" Foreground="{StaticResource PredatorAccentBrush}" Symbol="DeveloperBoard24" />
+                <TextBlock Margin="8,0,0,0" Style="{StaticResource CardTitleTextStyle}" Text="Processor" />
+              </StackPanel>
+              <TextBlock Style="{StaticResource CardValueTextStyle}" Text="{Binding ViewModel.CpuLine, Mode=OneWay}" />
+              <TextBlock Style="{StaticResource CardHintTextStyle}" Text="{Binding ViewModel.CpuCoresLine, Mode=OneWay}" />
+            </StackPanel>
+          </ui:Card>
+
+          <ui:Card Style="{StaticResource InfoCardStyle}">
+            <StackPanel>
+              <StackPanel Style="{StaticResource CardHeaderPanelStyle}">
+                <ui:SymbolIcon FontSize="18" Foreground="{StaticResource PredatorAccentBrush}" Symbol="Rocket24" />
+                <TextBlock Margin="8,0,0,0" Style="{StaticResource CardTitleTextStyle}" Text="Graphics" />
+              </StackPanel>
+              <TextBlock Style="{StaticResource CardValueTextStyle}" Text="{Binding ViewModel.GpuLine, Mode=OneWay}" />
+              <TextBlock Style="{StaticResource CardHintTextStyle}" Text="{Binding ViewModel.GpuDriverLine, Mode=OneWay}" />
+              <TextBlock Style="{StaticResource CardHintTextStyle}" Text="{Binding ViewModel.IgpuLine, Mode=OneWay}" />
+            </StackPanel>
+          </ui:Card>
+
+          <ui:Card Style="{StaticResource InfoCardStyle}">
+            <StackPanel>
+              <StackPanel Style="{StaticResource CardHeaderPanelStyle}">
+                <ui:SymbolIcon FontSize="18" Foreground="{StaticResource PredatorAccentBrush}" Symbol="Ram20" />
+                <TextBlock Margin="8,0,0,0" Style="{StaticResource CardTitleTextStyle}" Text="Memory" />
+              </StackPanel>
+              <TextBlock Style="{StaticResource CardValueTextStyle}" Text="{Binding ViewModel.RamLine, Mode=OneWay}" />
+            </StackPanel>
+          </ui:Card>
+
+          <ui:Card Style="{StaticResource InfoCardStyle}">
+            <StackPanel>
+              <StackPanel Style="{StaticResource CardHeaderPanelStyle}">
+                <ui:SymbolIcon FontSize="18" Foreground="{StaticResource PredatorAccentBrush}" Symbol="HardDrive20" />
+                <TextBlock Margin="8,0,0,0" Style="{StaticResource CardTitleTextStyle}" Text="Storage" />
+              </StackPanel>
+              <TextBlock Style="{StaticResource CardValueTextStyle}" Text="{Binding ViewModel.DisksLine, Mode=OneWay}" />
+            </StackPanel>
+          </ui:Card>
+
+          <ui:Card Style="{StaticResource InfoCardStyle}">
+            <StackPanel>
+              <StackPanel Style="{StaticResource CardHeaderPanelStyle}">
+                <ui:SymbolIcon FontSize="18" Foreground="{StaticResource PredatorAccentBrush}" Symbol="Desktop24" />
+                <TextBlock Margin="8,0,0,0" Style="{StaticResource CardTitleTextStyle}" Text="Display &amp; Power" />
+              </StackPanel>
+              <TextBlock Style="{StaticResource CardValueTextStyle}" Text="{Binding ViewModel.DisplayLine, Mode=OneWay}" />
+              <TextBlock Style="{StaticResource CardHintTextStyle}" Text="{Binding ViewModel.PowerLine, Mode=OneWay}" />
+              <TextBlock Style="{StaticResource CardHintTextStyle}" Text="{Binding ViewModel.OsLine, Mode=OneWay}" />
+            </StackPanel>
+          </ui:Card>
+        </WrapPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</Page>

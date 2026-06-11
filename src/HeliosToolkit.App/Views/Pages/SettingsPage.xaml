@@ -1,0 +1,111 @@
+<Page
+  x:Class="HeliosToolkit.App.Views.Pages.SettingsPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DesignHeight="700"
+  d:DesignWidth="1100"
+  Title="Settings"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+
+  <Page.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
+  </Page.Resources>
+
+  <Grid Margin="32,24,20,0">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0">
+      <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="Settings" />
+      <TextBlock
+        Margin="0,4,0,0"
+        Style="{StaticResource PageSubtitleTextStyle}"
+        Text="{Binding ViewModel.VersionText, Mode=OneWay}" />
+    </StackPanel>
+
+    <ScrollViewer Grid.Row="1" Margin="0,18,0,0" Padding="0,0,12,24" VerticalScrollBarVisibility="Auto">
+      <StackPanel>
+        <ui:Card Margin="0,0,0,12" Padding="20">
+          <StackPanel>
+            <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Updates" />
+            <TextBlock
+              Margin="0,4,0,12"
+              Style="{StaticResource PageSubtitleTextStyle}"
+              Text="Helios checks the GitHub Releases page. It never installs anything automatically." />
+            <StackPanel Orientation="Horizontal">
+              <ui:Button
+                Margin="0,0,8,0"
+                Command="{Binding ViewModel.CheckForUpdatesCommand}"
+                Content="Check for updates"
+                Icon="{ui:SymbolIcon ArrowDownload24}" />
+              <ui:Button
+                Margin="0,0,8,0"
+                Command="{Binding ViewModel.RefreshManifestCommand}"
+                Content="Refresh driver manifest"
+                Icon="{ui:SymbolIcon ArrowSync24}" />
+              <ui:Button
+                Command="{Binding ViewModel.OpenUpdateUrlCommand}"
+                Content="Open release"
+                Icon="{ui:SymbolIcon Open24}"
+                Visibility="{Binding ViewModel.HasUpdateLink, Converter={StaticResource BoolToVis}}" />
+            </StackPanel>
+            <TextBlock
+              Margin="0,12,0,0"
+              Style="{StaticResource PageSubtitleTextStyle}"
+              Text="{Binding ViewModel.UpdateStatus, Mode=OneWay}" />
+          </StackPanel>
+        </ui:Card>
+
+        <ui:Card Margin="0,0,0,12" Padding="20">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+              <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Logs" />
+              <TextBlock
+                Margin="0,4,0,0"
+                Style="{StaticResource PageSubtitleTextStyle}"
+                Text="Every action is logged. Open the folder if you need to send a log for help." />
+            </StackPanel>
+            <ui:Button
+              Grid.Column="1"
+              VerticalAlignment="Center"
+              Command="{Binding ViewModel.OpenLogsCommand}"
+              Content="Open logs"
+              Icon="{ui:SymbolIcon DocumentBulletList24}" />
+          </Grid>
+        </ui:Card>
+
+        <ui:Card Padding="20">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+              <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="About" />
+              <TextBlock
+                Margin="0,4,0,0"
+                Style="{StaticResource PageSubtitleTextStyle}"
+                Text="Helios Neo Toolkit is open source. Issues and contributions welcome." />
+            </StackPanel>
+            <ui:Button
+              Grid.Column="1"
+              VerticalAlignment="Center"
+              Command="{Binding ViewModel.OpenRepoCommand}"
+              Content="GitHub repo"
+              Icon="{ui:SymbolIcon Code24}" />
+          </Grid>
+        </ui:Card>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</Page>

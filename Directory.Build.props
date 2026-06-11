@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version Condition="'$(Version)' == ''">0.1.0</Version>
+    <Authors>Nuk3er</Authors>
+    <Product>Helios Neo Toolkit</Product>
+    <Copyright>© 2026 Nuk3er</Copyright>
+    <RepositoryUrl>https://github.com/nuk3er/acer-predator-helios-neo-16s-ai-driver-finder-updater</RepositoryUrl>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+  </PropertyGroup>
+</Project>
