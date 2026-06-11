@@ -5,7 +5,10 @@ Driver finder, updater and gaming optimizer built specifically for the
 NVIDIA GeForce RTX 5070 / 5070 Ti Laptop GPU, 16" 2560×1600 OLED 240 Hz —
 running a (debloated) Windows 11.
 
-> ⚠️ Work in progress. The feature set below lands milestone by milestone.
+A polished, single-file Windows 11 app (Fluent dark UI) that finds your drivers,
+debloats the NVIDIA driver before install, and applies the gaming tweaks that
+actually move the needle on input latency and frame consistency — every one
+labeled by risk and fully reversible.
 
 ## Features
 
