@@ -53,6 +53,34 @@
         Visibility="{Binding ViewModel.IsLoading, Converter={StaticResource BoolToVis}}" />
       <ScrollViewer Padding="0,0,12,24" VerticalScrollBarVisibility="Auto">
         <StackPanel>
+          <!-- Recommended driver-profile settings (safe, manual) -->
+          <ui:CardExpander Margin="0,0,12,14" Icon="{ui:SymbolIcon Trophy24}">
+            <ui:CardExpander.Header>
+              <StackPanel>
+                <TextBlock FontSize="15" FontWeight="SemiBold" Text="Recommended NVIDIA driver settings for low latency" />
+                <TextBlock
+                  Margin="0,3,0,0"
+                  FontSize="12.5"
+                  Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                  Text="Set these once in the NVIDIA App (Graphics → Global) or NVIDIA Control Panel. They give the most consistent frame pacing and lowest input lag." />
+              </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel Margin="0,4,0,0">
+              <TextBlock Margin="0,0,0,8" FontSize="12.5" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                         Text="• Power management mode → Prefer maximum performance" />
+              <TextBlock Margin="0,0,0,8" FontSize="12.5" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                         Text="• Low Latency Mode → Ultra (or On). For supported games, enable NVIDIA Reflex in-game instead — it's even better." />
+              <TextBlock Margin="0,0,0,8" FontSize="12.5" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                         Text="• Vertical sync → Off (cap FPS a few frames below 240 with the in-game limiter or Reflex to stay in the VRR window)" />
+              <TextBlock Margin="0,0,0,8" FontSize="12.5" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                         Text="• Monitor technology → G-SYNC / G-SYNC Compatible (your 240 Hz OLED supports VRR)" />
+              <TextBlock Margin="0,0,0,12" FontSize="12.5" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                         Text="• Texture filtering – Quality → High performance (a tiny, usually invisible image trade for steadier frames)" />
+              <TextBlock Margin="0,0,0,4" FontSize="11.5" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap"
+                         Text="These are intentionally set by hand: writing them through a hidden driver API without testing on this exact driver build risks crashing, so the toolkit keeps them safe and transparent." />
+            </StackPanel>
+          </ui:CardExpander>
+
           <!-- Driver debloat helper -->
           <ui:CardExpander Margin="0,0,12,14" Icon="{ui:SymbolIcon BroomSparkle24}">
             <ui:CardExpander.Header>
