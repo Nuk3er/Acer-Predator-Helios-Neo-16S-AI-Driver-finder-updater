@@ -8,6 +8,7 @@ using HeliosToolkit.App.Services.Hardware;
 using HeliosToolkit.App.Services.Safety;
 using HeliosToolkit.App.Services.System;
 using HeliosToolkit.App.Services.Tweaks;
+using HeliosToolkit.App.Services.Update;
 using HeliosToolkit.App.ViewModels;
 using HeliosToolkit.App.Views;
 using HeliosToolkit.App.Views.Pages;
@@ -35,6 +36,7 @@ public partial class App
             // Shell
             services.AddSingleton<MainWindow>();
             services.AddSingleton<MainWindowViewModel>();
+            services.AddSingleton<OnboardingService>();
             services.AddSingleton<INavigationViewPageProvider, NavigationPageProvider>();
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<ISnackbarService, SnackbarService>();
@@ -65,6 +67,10 @@ public partial class App
             services.AddSingleton<BackupStore>();
             services.AddSingleton<RestorePointService>();
             services.AddSingleton<TweakEngine>();
+            services.AddSingleton<ProfileService>();
+
+            // Updates & settings
+            services.AddSingleton<AppUpdateService>();
 
             // Pages + view models (singletons: NavigationView keeps page state alive)
             services.AddSingleton<DashboardPage>();

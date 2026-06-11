@@ -1,3 +1,4 @@
+using HeliosToolkit.App.Services;
 using HeliosToolkit.App.ViewModels;
 using HeliosToolkit.App.Views.Pages;
 using Wpf.Ui;
@@ -7,6 +8,8 @@ namespace HeliosToolkit.App.Views;
 
 public partial class MainWindow
 {
+    private readonly OnboardingService _onboarding;
+
     public MainWindowViewModel ViewModel { get; }
 
     public MainWindow(
@@ -14,9 +17,11 @@ public partial class MainWindow
         INavigationViewPageProvider pageProvider,
         INavigationService navigationService,
         ISnackbarService snackbarService,
-        IContentDialogService contentDialogService)
+        IContentDialogService contentDialogService,
+        OnboardingService onboarding)
     {
         ViewModel = viewModel;
+        _onboarding = onboarding;
         DataContext = this;
         InitializeComponent();
 
@@ -25,6 +30,12 @@ public partial class MainWindow
         RootNavigation.SetPageProviderService(pageProvider);
         navigationService.SetNavigationControl(RootNavigation);
 
-        Loaded += (_, _) => RootNavigation.Navigate(typeof(DashboardPage));
+        Loaded += OnLoaded;
+    }
+
+    private async void OnLoaded(object sender, global::System.Windows.RoutedEventArgs e)
+    {
+        RootNavigation.Navigate(typeof(DashboardPage));
+        await _onboarding.ShowIfFirstRunAsync();
     }
 }
