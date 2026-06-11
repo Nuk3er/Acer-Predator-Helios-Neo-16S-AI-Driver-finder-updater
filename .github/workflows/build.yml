@@ -5,6 +5,11 @@ on:
     branches: ['**']
     tags: ['v*']
   pull_request:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 0.2.0). Creates tag v{version} and a GitHub Release with the EXE.'
+        required: true
 
 permissions:
   contents: read
@@ -52,7 +57,10 @@ jobs:
         shell: pwsh
         run: |
           $version = "0.0.0-ci.${{ github.run_number }}"
-          if ("${{ github.ref }}".StartsWith("refs/tags/v")) {
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $version = "${{ inputs.version }}".TrimStart("v")
+          }
+          elseif ("${{ github.ref }}".StartsWith("refs/tags/v")) {
             $version = "${{ github.ref_name }}".TrimStart("v")
           }
           "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
@@ -80,7 +88,7 @@ jobs:
     name: GitHub Release
     runs-on: ubuntu-latest
     needs: build-windows
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
     steps:
@@ -90,6 +98,7 @@ jobs:
           path: publish
       - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', inputs.version) || github.ref_name }}
           files: |
             publish/HeliosToolkit.exe
             publish/HeliosToolkit.exe.sha256
