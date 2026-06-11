@@ -4,6 +4,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
   xmlns:controls="clr-namespace:HeliosToolkit.App.Views.Controls"
+  xmlns:conv="clr-namespace:HeliosToolkit.App.Converters"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   mc:Ignorable="d"
@@ -14,6 +15,7 @@
 
   <Page.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    <conv:InverseBooleanConverter x:Key="InverseBool" />
   </Page.Resources>
 
   <Grid Margin="32,24,20,0">
@@ -50,7 +52,92 @@
         IsIndeterminate="True"
         Visibility="{Binding ViewModel.IsLoading, Converter={StaticResource BoolToVis}}" />
       <ScrollViewer Padding="0,0,12,24" VerticalScrollBarVisibility="Auto">
-        <controls:TweakListView DataContext="{Binding ViewModel.GroupedTweaks}" />
+        <StackPanel>
+          <!-- Driver debloat helper -->
+          <ui:CardExpander Margin="0,0,12,14" Icon="{ui:SymbolIcon BroomSparkle24}">
+            <ui:CardExpander.Header>
+              <StackPanel>
+                <TextBlock FontSize="15" FontWeight="SemiBold" Text="Debloat NVIDIA driver before installing" />
+                <TextBlock
+                  Margin="0,3,0,0"
+                  FontSize="12.5"
+                  Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                  Text="Strip GeForce Experience, the NVIDIA App, telemetry and other extras — keep just the driver and the bits this laptop needs." />
+              </StackPanel>
+            </ui:CardExpander.Header>
+
+            <StackPanel Margin="0,4,0,0">
+              <TextBlock
+                Margin="0,0,0,10"
+                FontSize="12.5"
+                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                Text="{Binding ViewModel.DebloatStatus, Mode=OneWay}"
+                TextWrapping="Wrap" />
+
+              <StackPanel Orientation="Horizontal">
+                <ui:Button
+                  Margin="0,0,8,0"
+                  Command="{Binding ViewModel.PickAndExtractCommand}"
+                  Content="Pick driver .exe…"
+                  Icon="{ui:SymbolIcon FolderOpen24}"
+                  IsEnabled="{Binding ViewModel.IsDebloatBusy, Converter={StaticResource InverseBool}}" />
+                <ui:Button
+                  Appearance="Primary"
+                  Command="{Binding ViewModel.BuildAndLaunchCommand}"
+                  Content="Build &amp; launch trimmed installer"
+                  Icon="{ui:SymbolIcon Play24}"
+                  Visibility="{Binding ViewModel.HasComponents, Converter={StaticResource BoolToVis}}" />
+              </StackPanel>
+
+              <ui:ProgressRing
+                Margin="0,12,0,0"
+                HorizontalAlignment="Left"
+                IsIndeterminate="True"
+                Visibility="{Binding ViewModel.IsDebloatBusy, Converter={StaticResource BoolToVis}}" />
+
+              <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding ViewModel.Components}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Border Margin="0,0,0,4" Padding="10,6" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                      <Grid>
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="Auto" />
+                          <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox
+                          Grid.Column="0"
+                          Margin="0,0,10,0"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding IsKept, Mode=TwoWay}"
+                          IsEnabled="{Binding IsEnabled}" />
+                        <StackPanel Grid.Column="1">
+                          <StackPanel Orientation="Horizontal">
+                            <TextBlock FontWeight="SemiBold" Text="{Binding FolderName}" />
+                            <Border
+                              Margin="8,0,0,0"
+                              Padding="6,1"
+                              VerticalAlignment="Center"
+                              Background="{StaticResource RiskInfoBrush}"
+                              CornerRadius="4"
+                              Visibility="{Binding Required, Converter={StaticResource BoolToVis}}">
+                              <TextBlock FontSize="10" Foreground="White" Text="REQUIRED" />
+                            </Border>
+                          </StackPanel>
+                          <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Text="{Binding Description}" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </ui:CardExpander>
+
+          <controls:TweakListView DataContext="{Binding ViewModel.GroupedTweaks}" />
+        </StackPanel>
       </ScrollViewer>
     </Grid>
   </Grid>

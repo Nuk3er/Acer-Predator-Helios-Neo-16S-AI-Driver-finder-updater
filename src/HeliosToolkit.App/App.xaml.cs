@@ -60,6 +60,7 @@ public partial class App
             services.AddSingleton<DriverStatusService>();
             services.AddSingleton<DownloadService>();
             services.AddSingleton<DriverHealthState>();
+            services.AddSingleton<NvidiaPackageDebloater>();
 
             // Tweak engine & safety
             services.AddSingleton<TimerResolutionService>();
