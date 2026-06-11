@@ -84,6 +84,22 @@ public static class TweakCatalogMetadata
                 "and background noise.",
         },
 
+        new()
+        {
+            Id = "nv-drs-performance",
+            Name = "Driver profile: maximum performance bundle (NVAPI)",
+            Page = TweakPage.Nvidia,
+            Category = "Driver profile",
+            Risk = RiskLevel.Situational,
+            Description =
+                "Writes the global driver profile through NVIDIA's settings API: Power management = Prefer " +
+                "maximum performance, Threaded optimization ON, V-Sync OFF, Max pre-rendered frames = 1, " +
+                "Texture filtering = High performance (+ aniso/trilinear optimizations). The same changes as " +
+                "the manual checklist above, applied in one click — originals are read back first so revert " +
+                "restores your exact previous profile. 'Prefer max performance' costs heat/battery on idle; " +
+                "use it plugged in.",
+        },
+
         // ───────────────────────── Windows page ─────────────────────────
         new()
         {
@@ -193,6 +209,45 @@ public static class TweakCatalogMetadata
             Description =
                 "Disables ASPM so the PCIe links to the GPU and NVMe never drop into low-power states while " +
                 "plugged in. Removes rare wake-from-L1 hitches; slightly higher idle power. Pointless on battery.",
+        },
+        new()
+        {
+            Id = "proc-min-100",
+            Name = "Minimum processor state 100% (AC)",
+            Page = TweakPage.Windows,
+            Category = "Power",
+            Risk = RiskLevel.Situational,
+            Description =
+                "Keeps the 275HX from dropping to low clock floors between bursts while plugged in — removes " +
+                "clock-ramp latency at the cost of idle heat and fan noise. On modern HWP processors the gain " +
+                "is smaller than the old guides claim; try it and measure. powercfg PROCTHROTTLEMIN = 100 (AC).",
+        },
+        new()
+        {
+            Id = "epp-performance",
+            Name = "Energy preference: maximum performance (AC)",
+            Page = TweakPage.Windows,
+            Category = "Power",
+            Risk = RiskLevel.Situational,
+            Description =
+                "Sets the hardware Energy Performance Preference to 0 (full performance bias) while plugged in, " +
+                "telling the CPU's own governor to favor speed over efficiency in every decision. One of the " +
+                "few power knobs that measurably changes burst behavior on Arrow Lake-HX. powercfg PERFEPP = 0 (AC).",
+        },
+        new()
+        {
+            Id = "idle-disable",
+            Name = "Disable processor idle states (C-states)",
+            Page = TweakPage.Windows,
+            Category = "Power",
+            Risk = RiskLevel.Risky,
+            Description =
+                "Stops cores from entering C-states, eliminating wake-from-idle latency entirely. " +
+                "powercfg IDLEDISABLE = 1 (AC).",
+            Warning =
+                "This pegs package power even at desktop idle: massive extra heat in a laptop chassis, loud " +
+                "fans, and it can steal boost headroom from the cores doing real work (less thermal budget). " +
+                "Only for short latency-critical sessions, plugged in, with cooling maxed — revert afterwards.",
         },
         new()
         {
@@ -339,6 +394,55 @@ public static class TweakCatalogMetadata
                 "smoothing stays on — nobody wants jagged text.",
         },
 
+        new()
+        {
+            Id = "disk-idle-never",
+            Name = "Never power down the NVMe drives (AC)",
+            Page = TweakPage.Windows,
+            Category = "Storage (NVMe)",
+            Risk = RiskLevel.Situational,
+            Description =
+                "Sets the disk idle timeout to 0 (never) while plugged in, so your two Gen4 drives never drop " +
+                "into low-power states mid-session — kills the rare multi-second stall when a sleeping drive " +
+                "wakes during a level load. Slightly higher idle power. powercfg DISKIDLE = 0 (AC).",
+        },
+        new()
+        {
+            Id = "ntfs-last-access-off",
+            Name = "NTFS last-access timestamps off",
+            Page = TweakPage.Windows,
+            Category = "Storage (NVMe)",
+            Risk = RiskLevel.Safe,
+            Description =
+                "Stops NTFS from writing a metadata update every time anything reads a file. Fewer tiny writes, " +
+                "marginally less I/O noise during gaming and lower SSD wear; almost nothing depends on these " +
+                "timestamps. fsutil behavior set disablelastaccess 1 (revert returns it to system-managed).",
+        },
+        new()
+        {
+            Id = "ntfs-8dot3-off",
+            Name = "NTFS short (8.3) filename generation off",
+            Page = TweakPage.Windows,
+            Category = "Storage (NVMe)",
+            Risk = RiskLevel.Situational,
+            Description =
+                "Stops NTFS from generating DOS-style PROGRA~1 names for every new file — a small win for " +
+                "directories with thousands of files (shader caches, game asset folders). Applies to newly " +
+                "created files only. A few ancient installers still expect short names, hence Situational. " +
+                "fsutil behavior set disable8dot3 1.",
+        },
+        new()
+        {
+            Id = "trim-info",
+            Name = "SSD TRIM status",
+            Page = TweakPage.Windows,
+            Category = "Storage (NVMe)",
+            Risk = RiskLevel.Info,
+            Description =
+                "Verifies that delete notifications (TRIM/deallocate) are enabled so your NVMe drives keep " +
+                "their ~7000 MB/s performance as they fill. Windows enables this by default — this card just " +
+                "confirms it. 'Applied' means TRIM is on; nothing is changed from here.",
+        },
         new()
         {
             Id = "bcd-clock-defaults",

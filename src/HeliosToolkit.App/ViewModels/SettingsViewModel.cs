@@ -35,6 +35,11 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _hasUpdateLink;
 
+    [ObservableProperty]
+    private bool _canInstallUpdate;
+
+    private string? _updateExeUrl;
+
     [RelayCommand]
     private async Task CheckForUpdatesAsync()
     {
@@ -43,6 +48,7 @@ public partial class SettingsViewModel : ObservableObject
             IsChecking = true;
             UpdateStatus = "Checking…";
             HasUpdateLink = false;
+            CanInstallUpdate = false;
             AppUpdateCheck check = await _updates.CheckAsync();
 
             if (check.UpdateAvailable)
@@ -50,6 +56,12 @@ public partial class SettingsViewModel : ObservableObject
                 UpdateStatus = $"Update available: {check.LatestTag} (you have {check.CurrentVersion}).";
                 UpdateUrl = check.ReleaseUrl;
                 HasUpdateLink = check.ReleaseUrl is not null;
+                _updateExeUrl = check.ExeDownloadUrl;
+                CanInstallUpdate = _updateExeUrl is not null;
+            }
+            else if (check.NoReleasesYet)
+            {
+                UpdateStatus = "No releases have been published yet — you're running a development build.";
             }
             else if (check.LatestTag is not null)
             {
@@ -59,6 +71,32 @@ public partial class SettingsViewModel : ObservableObject
             {
                 UpdateStatus = "Could not reach GitHub. Check your connection and try again.";
             }
+        }
+        finally
+        {
+            IsChecking = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task InstallUpdateAsync()
+    {
+        if (_updateExeUrl is null)
+        {
+            return;
+        }
+
+        try
+        {
+            IsChecking = true;
+            var progress = new Progress<double>(p => UpdateStatus = $"Downloading update… {p:P0}");
+            await _updates.DownloadAndInstallAsync(_updateExeUrl, progress);
+            // The app exits inside DownloadAndInstallAsync; this line only runs on failure paths.
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "In-app update failed");
+            UpdateStatus = $"Update failed: {e.Message} — grab the EXE from the Releases page instead.";
         }
         finally
         {

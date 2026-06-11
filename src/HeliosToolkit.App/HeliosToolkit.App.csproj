@@ -4,6 +4,8 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <!-- WinForms only for the tray NotifyIcon -->
+    <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>HeliosToolkit.App</RootNamespace>
     <AssemblyName>HeliosToolkit</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -14,6 +16,12 @@
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <AssemblyTitle>Helios Neo Toolkit</AssemblyTitle>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WinForms is only here for the tray icon; keep its implicit usings out of WPF code -->
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WPF-UI" Version="4.3.0" />

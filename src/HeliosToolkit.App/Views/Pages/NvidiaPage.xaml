@@ -82,7 +82,7 @@
           </ui:CardExpander>
 
           <!-- Driver debloat helper -->
-          <ui:CardExpander Margin="0,0,12,14" Icon="{ui:SymbolIcon BroomSparkle24}">
+          <ui:CardExpander Margin="0,0,12,14" Icon="{ui:SymbolIcon Broom24}">
             <ui:CardExpander.Header>
               <StackPanel>
                 <TextBlock FontSize="15" FontWeight="SemiBold" Text="Debloat NVIDIA driver before installing" />

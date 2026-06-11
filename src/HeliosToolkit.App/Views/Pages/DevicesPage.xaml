@@ -114,32 +114,80 @@
 
     <DataTemplate x:Key="ProblemDeviceTemplate" DataType="{x:Type hw:PnpDevice}">
       <ui:Card Margin="0,0,12,8" Padding="14,10">
-        <StackPanel>
-          <StackPanel Orientation="Horizontal">
-            <ui:SymbolIcon
-              Margin="0,0,8,0"
-              Foreground="{StaticResource RiskRiskyBrush}"
-              Symbol="ErrorCircle24" />
-            <TextBlock FontWeight="SemiBold" Text="{Binding Name}" />
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon
+                Margin="0,0,8,0"
+                Foreground="{StaticResource RiskRiskyBrush}"
+                Symbol="ErrorCircle24" />
+              <TextBlock FontWeight="SemiBold" Text="{Binding Name}" />
+              <TextBlock
+                Margin="10,0,0,0"
+                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                Text="{Binding PnpClass}" />
+            </StackPanel>
             <TextBlock
-              Margin="10,0,0,0"
+              Margin="28,2,0,0"
+              FontSize="12.5"
+              Foreground="{StaticResource RiskRiskyBrush}"
+              Text="{Binding ProblemText}" />
+            <TextBlock
+              Margin="28,2,0,0"
+              FontSize="11.5"
+              FontFamily="Consolas"
               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-              Text="{Binding PnpClass}" />
+              Text="{Binding HardwareIdsText}"
+              TextWrapping="Wrap" />
           </StackPanel>
-          <TextBlock
-            Margin="28,2,0,0"
-            FontSize="12.5"
-            Foreground="{StaticResource RiskRiskyBrush}"
-            Text="{Binding ProblemText}" />
-          <TextBlock
-            Margin="28,2,0,0"
-            FontSize="11.5"
-            FontFamily="Consolas"
-            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-            Text="{Binding HardwareIdsText}"
-            TextWrapping="Wrap" />
-        </StackPanel>
+          <ui:Button
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            Command="{Binding DataContext.ViewModel.OpenCatalogCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+            CommandParameter="{Binding}"
+            Content="Catalog"
+            Icon="{ui:SymbolIcon Globe24}"
+            ToolTip="Search the Microsoft Update Catalog for this hardware ID (manual download to your Downloads folder)" />
+        </Grid>
       </ui:Card>
+    </DataTemplate>
+
+    <DataTemplate x:Key="DriverUpdateTemplate" DataType="{x:Type vm:DriverUpdateViewModel}">
+      <Border Margin="0,0,0,4" Padding="10,7" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <CheckBox
+            Grid.Column="0"
+            Margin="0,0,10,0"
+            VerticalAlignment="Center"
+            IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+          <StackPanel Grid.Column="1">
+            <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="Wrap" />
+            <TextBlock
+              FontSize="11.5"
+              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+              Text="{Binding DetailLine}"
+              TextWrapping="Wrap" />
+          </StackPanel>
+          <Border
+            Grid.Column="2"
+            Padding="7,1"
+            VerticalAlignment="Center"
+            Background="{StaticResource PredatorAccentBrush}"
+            CornerRadius="4"
+            Visibility="{Binding IsForProblemDevice, Converter={StaticResource BoolToVis}}">
+            <TextBlock FontSize="10" FontWeight="Bold" Foreground="#0B0E11" Text="FIXES A PROBLEM" />
+          </Border>
+        </Grid>
+      </Border>
     </DataTemplate>
   </Page.Resources>
 
@@ -201,6 +249,56 @@
           ItemTemplate="{StaticResource ProblemDeviceTemplate}"
           ItemsSource="{Binding ViewModel.ProblemDevices}"
           Visibility="{Binding ViewModel.HasProblemDevices, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Driver fixes via Windows Update -->
+        <ui:Card Margin="0,8,12,10" Padding="16,12">
+          <StackPanel>
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon
+                Margin="0,0,8,0"
+                FontSize="18"
+                Foreground="{StaticResource PredatorAccentBrush}"
+                Symbol="WrenchScrewdriver24" />
+              <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Fix &amp; update drivers automatically" />
+            </StackPanel>
+            <TextBlock
+              Margin="0,6,0,10"
+              FontSize="12.5"
+              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+              Text="{Binding ViewModel.WuStatus, Mode=OneWay}"
+              TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal">
+              <ui:Button
+                Margin="0,0,8,0"
+                Appearance="Primary"
+                Command="{Binding ViewModel.FindDriversCommand}"
+                Content="Find drivers (Windows Update)"
+                Icon="{ui:SymbolIcon Search24}" />
+              <ui:Button
+                Margin="0,0,8,0"
+                Appearance="Primary"
+                Command="{Binding ViewModel.InstallSelectedDriversCommand}"
+                Content="Install selected silently"
+                Icon="{ui:SymbolIcon ArrowDownload24}"
+                Visibility="{Binding ViewModel.HasFoundUpdates, Converter={StaticResource BoolToVis}}" />
+              <ui:Button
+                Command="{Binding ViewModel.InstallInfFromFolderCommand}"
+                Content="Install from folder (INF)…"
+                Icon="{ui:SymbolIcon FolderOpen24}"
+                ToolTip="Point at an extracted driver folder (e.g. downloaded from the Catalog) and install it with pnputil" />
+            </StackPanel>
+            <ui:ProgressRing
+              Margin="0,10,0,0"
+              HorizontalAlignment="Left"
+              IsIndeterminate="True"
+              Visibility="{Binding ViewModel.IsWuBusy, Converter={StaticResource BoolToVis}}" />
+            <ItemsControl
+              Margin="0,10,0,0"
+              ItemTemplate="{StaticResource DriverUpdateTemplate}"
+              ItemsSource="{Binding ViewModel.FoundDriverUpdates}"
+              Visibility="{Binding ViewModel.HasFoundUpdates, Converter={StaticResource BoolToVis}}" />
+          </StackPanel>
+        </ui:Card>
 
         <!-- Driver updates -->
         <TextBlock

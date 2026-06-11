@@ -3,7 +3,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version Condition="'$(Version)' == ''">0.1.0</Version>
+    <Version Condition="'$(Version)' == ''">0.2.0</Version>
     <Authors>Nuk3er</Authors>
     <Product>Helios Neo Toolkit</Product>
     <Copyright>© 2026 Nuk3er</Copyright>

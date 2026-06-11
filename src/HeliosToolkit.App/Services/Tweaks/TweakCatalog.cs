@@ -15,7 +15,10 @@ public sealed class TweakCatalog
 {
     private readonly Dictionary<string, ITweak> _tweaks;
 
-    public TweakCatalog(SystemInfoService systemInfo, TimerResolutionService timerResolution)
+    public TweakCatalog(
+        SystemInfoService systemInfo,
+        TimerResolutionService timerResolution,
+        Nvidia.NvApiDrs nvapi)
     {
         var list = new List<ITweak>
         {
@@ -27,6 +30,7 @@ public sealed class TweakCatalog
             new ScheduledTaskTweak(Meta("nv-telemetry-off"),
                     @"\NvTmMon*", @"\NvTmRep*", @"\NvProfileUpdater*", "NvTm*", "NvProfileUpdater*")
                 .Combine(new ServiceStartupTweak(Meta("nv-telemetry-off"), "NvTelemetryContainer")),
+            NvDrsPerformance(nvapi),
 
             // ───── Windows: gaming features ─────
             GameDvrOff(),
@@ -41,6 +45,25 @@ public sealed class TweakCatalog
             UsbSuspendOff(),
             PcieAspmOff(),
             HibernateOff(),
+            PowerSetting("proc-min-100",
+                subgroup: "54533251-82be-4824-96c1-47b60b740d00",
+                setting: "893dee8e-2bef-41e0-89c6-b55d0929964c", appliedValue: 100, defaultValue: 5),
+            PowerSetting("epp-performance",
+                subgroup: "54533251-82be-4824-96c1-47b60b740d00",
+                setting: "36687f9e-e3a5-4dbf-b1dc-15eb381c6863", appliedValue: 0, defaultValue: 50),
+            PowerSetting("idle-disable",
+                subgroup: "54533251-82be-4824-96c1-47b60b740d00",
+                setting: "5d76a2ca-e8c0-402f-a133-2158492d58ad", appliedValue: 1, defaultValue: 0),
+
+            // ───── Windows: storage ─────
+            PowerSetting("disk-idle-never",
+                subgroup: "0012ee47-9041-4b5d-9b77-535fba8b1442",
+                setting: "6738e2c4-e8a5-4a42-b16a-e040e769756e", appliedValue: 0, defaultValue: 1200),
+            FsutilTweak("ntfs-last-access-off", "disablelastaccess", appliedValue: 1, defaultValue: 2,
+                isApplied: v => v is 1 or 3),
+            FsutilTweak("ntfs-8dot3-off", "disable8dot3", appliedValue: 1, defaultValue: 2,
+                isApplied: v => v is 1),
+            TrimInfo(),
 
             // ───── Windows: input ─────
             MouseAccelOff(),
@@ -632,6 +655,139 @@ public sealed class TweakCatalog
             return Task.FromResult(present ? TweakState.Applied : TweakState.NotApplicable);
         });
 
+    // ───────────────────────── NVIDIA driver profile (NVAPI) ─────────────────────────
+
+    private static ITweak NvDrsPerformance(Nvidia.NvApiDrs nvapi) => new DelegateTweak(
+        Meta("nv-drs-performance"),
+        detect: ct => Task.Run(() =>
+        {
+            IReadOnlyDictionary<uint, uint?>? current =
+                nvapi.ReadSettings(Nvidia.NvApiDrs.PerformanceProfile.Keys);
+            if (current is null)
+            {
+                return TweakState.NotApplicable; // NVAPI unavailable on this machine/driver
+            }
+
+            int matched = Nvidia.NvApiDrs.PerformanceProfile
+                .Count(kv => current.TryGetValue(kv.Key, out uint? v) && v == kv.Value);
+            return matched == Nvidia.NvApiDrs.PerformanceProfile.Count ? TweakState.Applied
+                : matched == 0 ? TweakState.NotApplied
+                : TweakState.Mixed;
+        }, ct),
+        apply: (backup, ct) => Task.Run(() =>
+        {
+            IReadOnlyDictionary<uint, uint?>? originals =
+                nvapi.ReadSettings(Nvidia.NvApiDrs.PerformanceProfile.Keys)
+                ?? throw new InvalidOperationException(
+                    "NVAPI is not available — is the NVIDIA driver installed and current?");
+
+            foreach ((uint id, uint? value) in originals)
+            {
+                backup.Capture(new BackupEntry
+                {
+                    TweakId = "nv-drs-performance",
+                    Kind = "nvapi-drs",
+                    Target = $"0x{id:X8}",
+                    Existed = value is not null,
+                    OriginalValue = value?.ToString(),
+                });
+            }
+
+            if (!nvapi.ApplySettings(Nvidia.NvApiDrs.PerformanceProfile))
+            {
+                throw new InvalidOperationException(
+                    "NVAPI rejected the profile write — driver may be too new for this interop. " +
+                    "Set the values manually in the NVIDIA App (see the checklist above).");
+            }
+        }, ct),
+        revert: (backup, ct) => Task.Run(() =>
+        {
+            var originals = new Dictionary<uint, uint?>();
+            foreach (BackupEntry e in backup.ForTweak("nv-drs-performance").Where(x => x.Kind == "nvapi-drs"))
+            {
+                string hex = e.Target.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
+                    ? e.Target[2..]
+                    : e.Target;
+                if (uint.TryParse(hex, global::System.Globalization.NumberStyles.HexNumber, null, out uint id))
+                {
+                    originals[id] = e.Existed && uint.TryParse(e.OriginalValue, out uint v) ? v : null;
+                }
+            }
+
+            if (originals.Count > 0 && !nvapi.RestoreSettings(originals))
+            {
+                throw new InvalidOperationException("NVAPI restore failed — set values manually in the NVIDIA App.");
+            }
+        }, ct));
+
+    // ───────────────────────── fsutil (NTFS) ─────────────────────────
+
+    private static ITweak FsutilTweak(
+        string id, string behavior, int appliedValue, int defaultValue, Func<int, bool> isApplied) =>
+        new DelegateTweak(
+            Meta(id),
+            detect: async ct =>
+            {
+                int? value = await QueryFsutilAsync(behavior, ct);
+                if (value is null)
+                {
+                    return TweakState.Unknown;
+                }
+
+                return isApplied(value.Value) ? TweakState.Applied : TweakState.NotApplied;
+            },
+            apply: async (backup, ct) =>
+            {
+                int? original = await QueryFsutilAsync(behavior, ct);
+                backup.Capture(new BackupEntry
+                {
+                    TweakId = id, Kind = "fsutil", Target = behavior,
+                    Existed = original is not null, OriginalValue = original?.ToString(),
+                });
+                await ProcessRunner.RunAsync("fsutil", $"behavior set {behavior} {appliedValue}", ct);
+            },
+            revert: async (backup, ct) =>
+            {
+                BackupEntry? e = backup.ForTweak(id).FirstOrDefault(x => x.Kind == "fsutil");
+                int value = e?.OriginalValue is not null && int.TryParse(e.OriginalValue, out int original)
+                    ? original
+                    : defaultValue;
+                await ProcessRunner.RunAsync("fsutil", $"behavior set {behavior} {value}", ct);
+            });
+
+    private static IInfoTweak TrimInfo() => new InfoTweak(
+        Meta("trim-info"),
+        linkUrl: null,
+        detect: async ct =>
+        {
+            // Output: "NTFS DisableDeleteNotify = 0  (Allows ...)" — 0 means TRIM is ON.
+            ProcessResult r = await ProcessRunner.RunAsync("fsutil", "behavior query disabledeletenotify", ct);
+            if (!r.Success)
+            {
+                return TweakState.Unknown;
+            }
+
+            global::System.Text.RegularExpressions.Match m =
+                global::System.Text.RegularExpressions.Regex.Match(r.StdOut, @"NTFS[^=]*=\s*(\d)");
+            return m.Success
+                ? (m.Groups[1].Value == "0" ? TweakState.Applied : TweakState.NotApplied)
+                : TweakState.Unknown;
+        });
+
+    /// <summary>Parses the first integer out of "fsutil behavior query X" (locale-tolerant).</summary>
+    private static async Task<int?> QueryFsutilAsync(string behavior, CancellationToken ct)
+    {
+        ProcessResult r = await ProcessRunner.RunAsync("fsutil", $"behavior query {behavior}", ct);
+        if (!r.Success)
+        {
+            return null;
+        }
+
+        global::System.Text.RegularExpressions.Match m =
+            global::System.Text.RegularExpressions.Regex.Match(r.StdOut, @"[=:]\s*(\d+)");
+        return m.Success && int.TryParse(m.Groups[1].Value, out int value) ? value : null;
+    }
+
     // ───────────────────────── helpers ─────────────────────────
 
     private const string HeliosStateKey = @"SOFTWARE\HeliosToolkit";
@@ -673,10 +829,19 @@ public sealed class TweakCatalog
         IBackupSource backup, string id, string subgroup, string setting, long fallback, CancellationToken ct)
     {
         BackupEntry? e = backup.ForTweak(id).FirstOrDefault(x => x.Kind == "powercfg");
-        long value = e?.OriginalValue is not null && long.TryParse(e.OriginalValue, out long original)
-            ? original
-            : fallback;
-        await PowerCfg.SetAcValueIndexAsync("scheme_current", subgroup, setting, value, ct);
+        if (e is { Existed: false })
+        {
+            // It was never explicitly set — remove our value so the scheme default returns.
+            PowerCfg.DeleteAcValue(subgroup, setting);
+        }
+        else
+        {
+            long value = e?.OriginalValue is not null && long.TryParse(e.OriginalValue, out long original)
+                ? original
+                : fallback;
+            await PowerCfg.SetAcValueIndexAsync("scheme_current", subgroup, setting, value, ct);
+        }
+
         await PowerCfg.SetActiveAsync("scheme_current", ct);
     }
 

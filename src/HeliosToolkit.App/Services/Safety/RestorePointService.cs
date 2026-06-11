@@ -49,6 +49,13 @@ public sealed class RestorePointService
                 Log.Warning("CreateRestorePoint returned {Code}", returnValue);
                 return returnValue == 1058 ? RestorePointResult.Disabled : RestorePointResult.Failed;
             }
+            catch (ManagementException e)
+            {
+                // "Provider load failure" et al. — System Protection is off or the SR
+                // service is stripped (common on debloated installs). Not an app error.
+                Log.Warning(e, "System Restore unavailable ({Message})", e.Message.Trim());
+                return RestorePointResult.Disabled;
+            }
             catch (Exception e)
             {
                 Log.Error(e, "System Restore point creation threw");
