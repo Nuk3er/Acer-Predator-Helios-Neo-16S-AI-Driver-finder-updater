@@ -1,0 +1,157 @@
+<Page
+  x:Class="HeliosToolkit.App.Views.Pages.LabPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  xmlns:controls="clr-namespace:HeliosToolkit.App.Views.Controls"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DesignHeight="850"
+  d:DesignWidth="1100"
+  Title="Lab"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+
+  <Page.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
+  </Page.Resources>
+
+  <Grid Margin="32,24,20,0">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0">
+      <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="Lab" />
+      <TextBlock
+        Margin="0,4,0,0"
+        Style="{StaticResource PageSubtitleTextStyle}"
+        Text="Measure instead of guess: calibrate the timer, hunt stutter sources, benchmark tweaks, check your connection." />
+    </StackPanel>
+
+    <ScrollViewer Grid.Row="1" Margin="0,16,0,0" Padding="0,0,12,24" VerticalScrollBarVisibility="Auto">
+      <StackPanel>
+
+        <!-- ───── Timer Resolution Calibrator ───── -->
+        <ui:CardExpander Margin="0,0,12,14" IsExpanded="True" Icon="{ui:SymbolIcon Timer24}">
+          <ui:CardExpander.Header>
+            <StackPanel>
+              <TextBlock FontSize="15" FontWeight="SemiBold" Text="Timer Resolution Calibrator" />
+              <TextBlock
+                Margin="0,3,0,0"
+                FontSize="12.5"
+                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                Text="Finds YOUR machine's best timer value (maybe 0.5030, maybe 0.5035) by measuring real Sleep(1) wake-up latency." />
+            </StackPanel>
+          </ui:CardExpander.Header>
+
+          <StackPanel Margin="0,4,0,0">
+            <TextBlock
+              FontSize="12.5"
+              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+              Text="{Binding ViewModel.Calibrator.ProgressText, Mode=OneWay}"
+              TextWrapping="Wrap" />
+            <TextBlock
+              Margin="0,4,0,0"
+              FontSize="12"
+              Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+              Text="{Binding ViewModel.Calibrator.CurrentText, Mode=OneWay}" />
+
+            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+              <ui:Button
+                Margin="0,0,8,0"
+                Appearance="Primary"
+                Command="{Binding ViewModel.Calibrator.RunCommand}"
+                Content="Run calibration"
+                Icon="{ui:SymbolIcon PlayCircle24}" />
+              <ui:Button
+                Margin="0,0,8,0"
+                Appearance="Primary"
+                Command="{Binding ViewModel.Calibrator.ApplyBestCommand}"
+                Content="Apply best value"
+                Icon="{ui:SymbolIcon CheckmarkCircle24}"
+                Visibility="{Binding ViewModel.Calibrator.HasResult, Converter={StaticResource BoolToVis}}" />
+              <ui:Button
+                Command="{Binding ViewModel.Calibrator.UseDefaultCommand}"
+                Content="Use 0.5000 default"
+                Visibility="{Binding ViewModel.Calibrator.HasResult, Converter={StaticResource BoolToVis}}" />
+            </StackPanel>
+
+            <ui:ProgressRing
+              Margin="0,10,0,0"
+              HorizontalAlignment="Left"
+              IsIndeterminate="True"
+              Visibility="{Binding ViewModel.Calibrator.IsRunning, Converter={StaticResource BoolToVis}}" />
+
+            <TextBlock
+              Margin="0,10,0,0"
+              FontSize="12.5"
+              FontWeight="SemiBold"
+              Foreground="{StaticResource PredatorAccentBrush}"
+              Text="{Binding ViewModel.Calibrator.RecommendationText, Mode=OneWay}"
+              TextWrapping="Wrap"
+              Visibility="{Binding ViewModel.Calibrator.HasResult, Converter={StaticResource BoolToVis}}" />
+
+            <controls:SweepChart
+              Height="210"
+              Margin="0,10,0,0"
+              BestPoint="{Binding ViewModel.Calibrator.ChartBest}"
+              Points="{Binding ViewModel.Calibrator.ChartPoints}"
+              Visibility="{Binding ViewModel.Calibrator.HasResult, Converter={StaticResource BoolToVis}}"
+              XLabelFormat="0.0000"
+              YLabelFormat="0.0000" />
+            <TextBlock
+              Margin="0,2,0,0"
+              FontSize="10.5"
+              Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+              Text="X: requested timer value (ms) · Y: lateness + jitter score (lower is better)"
+              Visibility="{Binding ViewModel.Calibrator.HasResult, Converter={StaticResource BoolToVis}}" />
+          </StackPanel>
+        </ui:CardExpander>
+
+        <!-- ───── Ping / jitter ───── -->
+        <ui:CardExpander Margin="0,0,12,14" Icon="{ui:SymbolIcon NetworkCheck24}">
+          <ui:CardExpander.Header>
+            <StackPanel>
+              <TextBlock FontSize="15" FontWeight="SemiBold" Text="Ping &amp; jitter test" />
+              <TextBlock
+                Margin="0,3,0,0"
+                FontSize="12.5"
+                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                Text="Verify your connection before/after the Network tweaks." />
+            </StackPanel>
+          </ui:CardExpander.Header>
+
+          <StackPanel Margin="0,4,0,0">
+            <StackPanel Orientation="Horizontal">
+              <ui:TextBox
+                Width="220"
+                Margin="0,0,8,0"
+                PlaceholderText="Host or IP (e.g. 1.1.1.1)"
+                Text="{Binding ViewModel.Ping.Host, UpdateSourceTrigger=PropertyChanged}" />
+              <ui:Button
+                Appearance="Primary"
+                Command="{Binding ViewModel.Ping.RunCommand}"
+                Content="Run 20 pings"
+                Icon="{ui:SymbolIcon PlayCircle24}" />
+              <ui:ProgressRing
+                Width="22"
+                Height="22"
+                Margin="10,0,0,0"
+                IsIndeterminate="True"
+                Visibility="{Binding ViewModel.Ping.IsRunning, Converter={StaticResource BoolToVis}}" />
+            </StackPanel>
+            <TextBlock
+              Margin="0,10,0,0"
+              FontSize="12.5"
+              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+              Text="{Binding ViewModel.Ping.ResultText, Mode=OneWay}"
+              TextWrapping="Wrap" />
+          </StackPanel>
+        </ui:CardExpander>
+
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</Page>

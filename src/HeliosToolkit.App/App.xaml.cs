@@ -81,6 +81,15 @@ public partial class App
             // Updates & settings
             services.AddSingleton<AppUpdateService>();
 
+            // Lab
+            services.AddSingleton<LogonTaskService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.TimerCalibrationService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.PingTestService>();
+            services.AddSingleton<ViewModels.Lab.CalibratorViewModel>();
+            services.AddSingleton<ViewModels.Lab.PingViewModel>();
+            services.AddSingleton<ViewModels.Lab.LabViewModel>();
+            services.AddSingleton<LabPage>();
+
             // Pages + view models (singletons: NavigationView keeps page state alive)
             services.AddSingleton<DashboardPage>();
             services.AddSingleton<DashboardViewModel>();
@@ -104,14 +113,24 @@ public partial class App
         AppPaths.EnsureCreated();
         await AppHost.StartAsync();
 
-        Log.Information("Helios Neo Toolkit starting (version {Version})",
-            typeof(App).Assembly.GetName().Version);
+        bool trayMode = e.Args.Contains("--tray", StringComparer.OrdinalIgnoreCase);
+        Log.Information("Helios Neo Toolkit starting (version {Version}, tray={Tray})",
+            typeof(App).Assembly.GetName().Version, trayMode);
 
         ApplicationAccentColorManager.Apply(
             System.Windows.Media.Color.FromRgb(0x00, 0xE5, 0xD1),
             ApplicationTheme.Dark);
 
-        AppHost.Services.GetRequiredService<MainWindow>().Show();
+        MainWindow window = AppHost.Services.GetRequiredService<MainWindow>();
+        if (trayMode)
+        {
+            // Logon-task mode: live in the tray and hold the calibrated timer.
+            AppHost.Services.GetRequiredService<TimerResolutionService>().Start();
+        }
+        else
+        {
+            window.Show();
+        }
     }
 
     private async void OnExit(object sender, ExitEventArgs e)
