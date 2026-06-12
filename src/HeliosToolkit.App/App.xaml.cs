@@ -65,6 +65,11 @@ public partial class App
             services.AddSingleton<HeliosToolkit.App.Services.Nvidia.NvApiDrs>();
             services.AddSingleton<TrayService>();
 
+            // Network / CPU topology
+            services.AddSingleton<HeliosToolkit.App.Services.Network.ActiveAdapterService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Network.NicTweakFactory>();
+            services.AddSingleton<CpuTopologyService>();
+
             // Tweak engine & safety
             services.AddSingleton<TimerResolutionService>();
             services.AddSingleton<TweakCatalog>();
