@@ -190,6 +190,125 @@
           </StackPanel>
         </ui:CardExpander>
 
+        <!-- ───── FPS / frame-time benchmark ───── -->
+        <ui:CardExpander Margin="0,0,12,14" Icon="{ui:SymbolIcon DataHistogram24}">
+          <ui:CardExpander.Header>
+            <StackPanel>
+              <TextBlock FontSize="15" FontWeight="SemiBold" Text="FPS &amp; frame-time benchmark" />
+              <TextBlock
+                Margin="0,3,0,0"
+                FontSize="12.5"
+                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                Text="Capture a game with Intel PresentMon, then A/B two runs to prove a tweak actually helped." />
+            </StackPanel>
+          </ui:CardExpander.Header>
+
+          <StackPanel Margin="0,4,0,0">
+            <TextBlock
+              FontSize="12.5"
+              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+              Text="{Binding ViewModel.Bench.Status, Mode=OneWay}"
+              TextWrapping="Wrap" />
+
+            <Grid Margin="0,10,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <ComboBox
+                Grid.Column="0"
+                Margin="0,0,8,0"
+                ItemsSource="{Binding ViewModel.Bench.Processes}"
+                SelectedItem="{Binding ViewModel.Bench.SelectedProcess}" />
+              <ui:Button
+                Grid.Column="1"
+                Command="{Binding ViewModel.Bench.RefreshProcessesCommand}"
+                Content="Refresh"
+                Icon="{ui:SymbolIcon ArrowSync24}" />
+            </Grid>
+
+            <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
+              <ui:TextBox
+                Width="240"
+                Margin="0,0,8,0"
+                PlaceholderText="Label (e.g. 'before tweaks')"
+                Text="{Binding ViewModel.Bench.Label, UpdateSourceTrigger=PropertyChanged}" />
+              <ComboBox
+                Width="90"
+                Margin="0,0,8,0"
+                ItemsSource="{Binding ViewModel.Bench.Durations}"
+                SelectedItem="{Binding ViewModel.Bench.SelectedDuration}" />
+              <ui:Button
+                Appearance="Primary"
+                Command="{Binding ViewModel.Bench.CaptureCommand}"
+                Content="Capture"
+                Icon="{ui:SymbolIcon RecordStop24}" />
+              <ui:ProgressRing
+                Width="22"
+                Height="22"
+                Margin="10,0,0,0"
+                IsIndeterminate="True"
+                Visibility="{Binding ViewModel.Bench.IsCapturing, Converter={StaticResource BoolToVis}}" />
+            </StackPanel>
+
+            <Grid Margin="0,14,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <ComboBox
+                Grid.Column="0"
+                Margin="0,0,8,0"
+                DisplayMemberPath="Display"
+                ItemsSource="{Binding ViewModel.Bench.Runs}"
+                SelectedItem="{Binding ViewModel.Bench.RunA}" />
+              <TextBlock Grid.Column="1" Margin="0,0,8,0" VerticalAlignment="Center" Text="vs" />
+              <ComboBox
+                Grid.Column="2"
+                Margin="0,0,8,0"
+                DisplayMemberPath="Display"
+                ItemsSource="{Binding ViewModel.Bench.Runs}"
+                SelectedItem="{Binding ViewModel.Bench.RunB}" />
+              <ui:Button
+                Grid.Column="3"
+                Command="{Binding ViewModel.Bench.CompareCommand}"
+                Content="Compare A/B"
+                Icon="{ui:SymbolIcon ArrowSwap24}" />
+            </Grid>
+
+            <Border
+              Margin="0,12,0,0"
+              Padding="14,10"
+              Background="{DynamicResource ControlFillColorDefaultBrush}"
+              CornerRadius="6"
+              Visibility="{Binding ViewModel.Bench.HasComparison, Converter={StaticResource BoolToVis}}">
+              <TextBlock
+                FontFamily="Consolas"
+                FontSize="12.5"
+                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                Text="{Binding ViewModel.Bench.ComparisonText, Mode=OneWay}"
+                TextWrapping="Wrap" />
+            </Border>
+
+            <controls:SweepChart
+              Height="200"
+              Margin="0,10,0,0"
+              Points="{Binding ViewModel.Bench.ChartA}"
+              SecondaryPoints="{Binding ViewModel.Bench.ChartB}"
+              Visibility="{Binding ViewModel.Bench.HasComparison, Converter={StaticResource BoolToVis}}"
+              XLabelFormat="0"
+              YLabelFormat="0.0" />
+            <TextBlock
+              Margin="0,2,0,0"
+              FontSize="10.5"
+              Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+              Text="Frame times (ms) over the capture — accent = A, gray = B. Lower and flatter is better."
+              Visibility="{Binding ViewModel.Bench.HasComparison, Converter={StaticResource BoolToVis}}" />
+          </StackPanel>
+        </ui:CardExpander>
+
         <!-- ───── Ping / jitter ───── -->
         <ui:CardExpander Margin="0,0,12,14" Icon="{ui:SymbolIcon NetworkCheck24}">
           <ui:CardExpander.Header>

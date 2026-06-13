@@ -87,8 +87,11 @@ public partial class App
             services.AddSingleton<HeliosToolkit.App.Services.Lab.PingTestService>();
             services.AddSingleton<HeliosToolkit.App.Services.Lab.KernelModuleMap>();
             services.AddSingleton<HeliosToolkit.App.Services.Lab.DpcMonitorService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.PresentMonService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.BenchRunStore>();
             services.AddSingleton<ViewModels.Lab.CalibratorViewModel>();
             services.AddSingleton<ViewModels.Lab.DpcMonitorViewModel>();
+            services.AddSingleton<ViewModels.Lab.BenchViewModel>();
             services.AddSingleton<ViewModels.Lab.PingViewModel>();
             services.AddSingleton<ViewModels.Lab.LabViewModel>();
             services.AddSingleton<LabPage>();
