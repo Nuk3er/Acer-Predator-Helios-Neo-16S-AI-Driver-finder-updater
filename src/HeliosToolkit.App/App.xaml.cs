@@ -65,6 +65,18 @@ public partial class App
             services.AddSingleton<HeliosToolkit.App.Services.Nvidia.NvApiDrs>();
             services.AddSingleton<TrayService>();
 
+            // Network / CPU topology
+            services.AddSingleton<HeliosToolkit.App.Services.Network.ActiveAdapterService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Network.NicTweakFactory>();
+            services.AddSingleton<CpuTopologyService>();
+            services.AddSingleton<UltimateSchemeProvider>();
+
+            // Game Boost
+            services.AddSingleton<HeliosToolkit.App.Services.Boost.BoostConfigStore>();
+            services.AddSingleton<HeliosToolkit.App.Services.Boost.BoostController>();
+            services.AddSingleton<HeliosToolkit.App.Services.Boost.GameWatchService>();
+            services.AddSingleton<BoostViewModel>();
+
             // Tweak engine & safety
             services.AddSingleton<TimerResolutionService>();
             services.AddSingleton<TweakCatalog>();
@@ -75,6 +87,21 @@ public partial class App
 
             // Updates & settings
             services.AddSingleton<AppUpdateService>();
+
+            // Lab
+            services.AddSingleton<LogonTaskService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.TimerCalibrationService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.PingTestService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.KernelModuleMap>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.DpcMonitorService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.PresentMonService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.BenchRunStore>();
+            services.AddSingleton<ViewModels.Lab.CalibratorViewModel>();
+            services.AddSingleton<ViewModels.Lab.DpcMonitorViewModel>();
+            services.AddSingleton<ViewModels.Lab.BenchViewModel>();
+            services.AddSingleton<ViewModels.Lab.PingViewModel>();
+            services.AddSingleton<ViewModels.Lab.LabViewModel>();
+            services.AddSingleton<LabPage>();
 
             // Pages + view models (singletons: NavigationView keeps page state alive)
             services.AddSingleton<DashboardPage>();
@@ -97,16 +124,41 @@ public partial class App
     private async void OnStartup(object sender, StartupEventArgs e)
     {
         AppPaths.EnsureCreated();
+        HeliosToolkit.App.Services.Lab.DpcMonitorService.CleanupStaleSession();
         await AppHost.StartAsync();
 
-        Log.Information("Helios Neo Toolkit starting (version {Version})",
-            typeof(App).Assembly.GetName().Version);
+        // Roll back any Boost session a previous crash left active.
+        try
+        {
+            if (await AppHost.Services.GetRequiredService<HeliosToolkit.App.Services.Boost.BoostController>()
+                    .RecoverAsync())
+            {
+                Log.Information("Recovered a leftover Boost session");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Boost recovery failed");
+        }
+
+        bool trayMode = e.Args.Contains("--tray", StringComparer.OrdinalIgnoreCase);
+        Log.Information("Helios Neo Toolkit starting (version {Version}, tray={Tray})",
+            typeof(App).Assembly.GetName().Version, trayMode);
 
         ApplicationAccentColorManager.Apply(
             System.Windows.Media.Color.FromRgb(0x00, 0xE5, 0xD1),
             ApplicationTheme.Dark);
 
-        AppHost.Services.GetRequiredService<MainWindow>().Show();
+        MainWindow window = AppHost.Services.GetRequiredService<MainWindow>();
+        if (trayMode)
+        {
+            // Logon-task mode: live in the tray and hold the calibrated timer.
+            AppHost.Services.GetRequiredService<TimerResolutionService>().Start();
+        }
+        else
+        {
+            window.Show();
+        }
     }
 
     private async void OnExit(object sender, ExitEventArgs e)

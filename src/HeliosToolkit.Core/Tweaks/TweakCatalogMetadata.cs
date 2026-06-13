@@ -296,10 +296,11 @@ public static class TweakCatalogMetadata
             Category = "Input",
             Risk = RiskLevel.Safe,
             Description =
-                "Requests a 0.5 ms system timer (NtSetTimerResolution) and opts this process out of timer " +
-                "coalescing, for snappier frame pacing in games that don't raise the timer themselves. On " +
-                "Windows 11 a raised timer only applies while some process requests it, so this holds only " +
-                "while Helios Toolkit is running — keep it minimized while gaming.",
+                "Requests a high-resolution system timer (your calibrated value from Lab → Timer Calibrator, " +
+                "default 0.5 ms) and opts this process out of timer coalescing, for snappier frame pacing in " +
+                "games that don't raise the timer themselves. On Windows 11 a raised timer only applies while " +
+                "some process requests it, so this holds only while Helios Toolkit runs — minimize to the tray " +
+                "while gaming, or enable the logon task in Settings.",
         },
 
         new()
@@ -341,6 +342,48 @@ public static class TweakCatalogMetadata
                 "why reviews of this tweak are mixed. Harmless to try.",
         },
 
+        new()
+        {
+            Id = "net-interrupt-moderation-off",
+            Name = "NIC interrupt moderation off",
+            Page = TweakPage.Windows,
+            Category = "Network",
+            Risk = RiskLevel.Situational,
+            Description =
+                "Tells the network adapter to raise an interrupt per packet instead of batching them — the one " +
+                "NIC tweak with a measurable latency effect, worth up to a few hundred microseconds per packet at " +
+                "the cost of more CPU under heavy traffic. Applied to the adapter that owns your default route via " +
+                "the standardized *InterruptModeration driver keyword; toggling briefly drops the link. Mostly an " +
+                "Ethernet tweak — many Wi-Fi drivers don't expose the knob, and then this honestly shows 'Not applicable'.",
+        },
+        new()
+        {
+            Id = "net-rsc-off",
+            Name = "Receive Segment Coalescing (RSC) off",
+            Page = TweakPage.Windows,
+            Category = "Network",
+            Risk = RiskLevel.Situational,
+            Description =
+                "Stops Windows from merging received TCP segments before delivering them (Disable-NetAdapterRsc " +
+                "on the active adapter) — coalescing trades a little latency for throughput efficiency. Helps " +
+                "TCP-based games and streaming-while-gaming; UDP shooters see little. Slightly higher CPU during " +
+                "big downloads, and the link blips when toggled. Your exact previous IPv4/IPv6 state is restored on revert.",
+        },
+        new()
+        {
+            Id = "net-power-saving-off",
+            Name = "Never power down the network adapter",
+            Page = TweakPage.Windows,
+            Category = "Network",
+            Risk = RiskLevel.Situational,
+            RequiresReboot = true,
+            RebootNote = "Adapter restart or reboot",
+            Description =
+                "Clears 'Allow the computer to turn off this device to save power' on the active adapter " +
+                "(PnPCapabilities = 0x18 on its class key) — the classic fix for the first packets after idle " +
+                "arriving late and Wi-Fi waking slowly after sleep. Unlike the AC-scoped power tweaks this also " +
+                "applies on battery, where it costs some runtime. Takes effect after the adapter restarts.",
+        },
         new()
         {
             Id = "tcp-nodelay",

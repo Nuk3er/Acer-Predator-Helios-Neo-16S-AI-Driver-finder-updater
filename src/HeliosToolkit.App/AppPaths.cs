@@ -14,10 +14,23 @@ public static class AppPaths
 
     public static string Cache => Path.Combine(Root, "cache");
 
+    public static string Tools => Path.Combine(Root, "tools");
+
+    public static string BenchCsv => Path.Combine(Root, "bench", "csv");
+
+    public static string BenchRuns => Path.Combine(Root, "bench", "runs");
+
+    public static string BoostSessionFile => Path.Combine(Root, "boost-session.json");
+
+    public static string BoostConfigFile => Path.Combine(Root, "boost-config.json");
+
     public static void EnsureCreated()
     {
         Directory.CreateDirectory(Logs);
         Directory.CreateDirectory(Backup);
         Directory.CreateDirectory(Cache);
+        Directory.CreateDirectory(Tools);
+        Directory.CreateDirectory(BenchCsv);
+        Directory.CreateDirectory(BenchRuns);
     }
 }

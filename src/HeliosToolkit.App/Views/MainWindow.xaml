@@ -60,6 +60,10 @@
           Icon="{ui:SymbolIcon Options24}"
           TargetPageType="{x:Type pages:WindowsTweaksPage}" />
         <ui:NavigationViewItem
+          Content="Lab"
+          Icon="{ui:SymbolIcon TopSpeed24}"
+          TargetPageType="{x:Type pages:LabPage}" />
+        <ui:NavigationViewItem
           Content="Backup &amp; Profiles"
           Icon="{ui:SymbolIcon ShieldCheckmark24}"
           TargetPageType="{x:Type pages:BackupPage}" />

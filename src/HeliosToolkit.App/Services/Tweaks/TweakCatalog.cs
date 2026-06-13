@@ -18,7 +18,8 @@ public sealed class TweakCatalog
     public TweakCatalog(
         SystemInfoService systemInfo,
         TimerResolutionService timerResolution,
-        Nvidia.NvApiDrs nvapi)
+        Nvidia.NvApiDrs nvapi,
+        Network.NicTweakFactory nicTweaks)
     {
         var list = new List<ITweak>
         {
@@ -75,6 +76,9 @@ public sealed class TweakCatalog
             NetThrottling(),
             MmcssGames(),
             TcpNoDelay(),
+            nicTweaks.InterruptModerationOff(Meta("net-interrupt-moderation-off")),
+            nicTweaks.RscOff(Meta("net-rsc-off")),
+            nicTweaks.PowerSavingOff(Meta("net-power-saving-off")),
 
             // ───── Windows: services / visuals / advanced ─────
             new ServiceStartupTweak(Meta("sysmain-off"), "SysMain"),

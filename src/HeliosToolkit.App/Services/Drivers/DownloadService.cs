@@ -12,9 +12,17 @@ public sealed class DownloadService(HttpClient http)
 {
     public static string DriversFolder => Path.Combine(KnownFolders.Downloads, "HeliosDrivers");
 
-    public async Task<DownloadOutcome> DownloadAsync(
+    public Task<DownloadOutcome> DownloadAsync(
         string url,
         string subfolder,
+        IProgress<double>? progress = null,
+        CancellationToken ct = default) =>
+        DownloadToAsync(url, Path.Combine(DriversFolder, Sanitize(subfolder)), progress, ct);
+
+    /// <summary>Same streaming download, but into any absolute directory (Lab tools etc.).</summary>
+    public async Task<DownloadOutcome> DownloadToAsync(
+        string url,
+        string absoluteDirectory,
         IProgress<double>? progress = null,
         CancellationToken ct = default)
     {
@@ -26,9 +34,8 @@ public sealed class DownloadService(HttpClient http)
             ?? FileNameFromUrl(url)
             ?? "download.bin";
 
-        string directory = Path.Combine(DriversFolder, Sanitize(subfolder));
-        Directory.CreateDirectory(directory);
-        string targetPath = Path.Combine(directory, Sanitize(fileName));
+        Directory.CreateDirectory(absoluteDirectory);
+        string targetPath = Path.Combine(absoluteDirectory, Sanitize(fileName));
 
         long? totalBytes = response.Content.Headers.ContentLength;
         long written = 0;

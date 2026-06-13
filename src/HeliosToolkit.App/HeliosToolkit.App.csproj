@@ -29,6 +29,10 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
     <PackageReference Include="System.Management" Version="9.0.0" />
     <PackageReference Include="SevenZipExtractor" Version="1.0.19" NoWarn="NU1701" GeneratePathProperty="true" />
+    <!-- Real-time kernel ETW (DPC/ISR monitor). ExcludeAssets keeps its native-DLL copy
+         targets out of the build — the real-time session path needs none of them, and
+         they break single-file publish. -->
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.2.3" ExcludeAssets="build;buildTransitive" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
