@@ -90,7 +90,7 @@ Have an idea? [Open an issue](../../issues).
 Requires the .NET 8 SDK (builds on Windows, Linux or macOS):
 
 ```bash
-dotnet test tests/HeliosToolkit.Core.Tests          # 155 unit tests
+dotnet test tests/HeliosToolkit.Core.Tests          # 214 unit tests
 dotnet publish src/HeliosToolkit.App -c Release -r win-x64 --self-contained true \
   -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 ```
