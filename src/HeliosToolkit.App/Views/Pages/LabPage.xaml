@@ -4,6 +4,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
   xmlns:controls="clr-namespace:HeliosToolkit.App.Views.Controls"
+  xmlns:conv="clr-namespace:HeliosToolkit.App.Converters"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   mc:Ignorable="d"
@@ -14,6 +15,7 @@
 
   <Page.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    <conv:DpcVerdictToBrushConverter x:Key="VerdictBrush" />
   </Page.Resources>
 
   <Grid Margin="32,24,20,0">
@@ -107,6 +109,84 @@
               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
               Text="X: requested timer value (ms) · Y: lateness + jitter score (lower is better)"
               Visibility="{Binding ViewModel.Calibrator.HasResult, Converter={StaticResource BoolToVis}}" />
+          </StackPanel>
+        </ui:CardExpander>
+
+        <!-- ───── DPC / ISR latency monitor ───── -->
+        <ui:CardExpander Margin="0,0,12,14" Icon="{ui:SymbolIcon PulseSquare24}">
+          <ui:CardExpander.Header>
+            <StackPanel>
+              <TextBlock FontSize="15" FontWeight="SemiBold" Text="DPC / ISR latency monitor" />
+              <TextBlock
+                Margin="0,3,0,0"
+                FontSize="12.5"
+                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                Text="Finds the driver causing micro-stutter and tells you what to do about it (LatencyMon, built in)." />
+            </StackPanel>
+          </ui:CardExpander.Header>
+
+          <StackPanel Margin="0,4,0,0">
+            <TextBlock
+              FontSize="12.5"
+              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+              Text="{Binding ViewModel.DpcMonitor.StatusText, Mode=OneWay}"
+              TextWrapping="Wrap" />
+            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+              <ui:Button
+                Appearance="Primary"
+                Command="{Binding ViewModel.DpcMonitor.StartStopCommand}"
+                Content="{Binding ViewModel.DpcMonitor.StartStopLabel, Mode=OneWay}"
+                Icon="{ui:SymbolIcon PlayCircle24}" />
+              <ui:ProgressRing
+                Width="22"
+                Height="22"
+                Margin="10,0,0,0"
+                IsIndeterminate="True"
+                Visibility="{Binding ViewModel.DpcMonitor.IsRunning, Converter={StaticResource BoolToVis}}" />
+            </StackPanel>
+
+            <ItemsControl Margin="0,14,0,0" ItemsSource="{Binding ViewModel.DpcMonitor.Rows}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Margin="0,0,0,5" Padding="12,8" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+                      <Border
+                        Grid.Column="0"
+                        Width="10"
+                        Height="10"
+                        Margin="0,4,12,0"
+                        VerticalAlignment="Top"
+                        Background="{Binding Verdict, Converter={StaticResource VerdictBrush}}"
+                        CornerRadius="5" />
+                      <StackPanel Grid.Column="1">
+                        <TextBlock FontWeight="SemiBold" Text="{Binding Module}" />
+                        <TextBlock
+                          FontSize="11.5"
+                          Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                          Text="{Binding Advice}"
+                          TextWrapping="Wrap" />
+                      </StackPanel>
+                      <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                        <TextBlock
+                          HorizontalAlignment="Right"
+                          FontWeight="SemiBold"
+                          Text="{Binding MaxUs, StringFormat='{}{0:0} µs max'}" />
+                        <TextBlock
+                          HorizontalAlignment="Right"
+                          FontSize="11"
+                          Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                          Text="{Binding AvgUs, StringFormat='{}avg {0:0.0} µs'}" />
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
           </StackPanel>
         </ui:CardExpander>
 

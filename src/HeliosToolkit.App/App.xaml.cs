@@ -85,7 +85,10 @@ public partial class App
             services.AddSingleton<LogonTaskService>();
             services.AddSingleton<HeliosToolkit.App.Services.Lab.TimerCalibrationService>();
             services.AddSingleton<HeliosToolkit.App.Services.Lab.PingTestService>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.KernelModuleMap>();
+            services.AddSingleton<HeliosToolkit.App.Services.Lab.DpcMonitorService>();
             services.AddSingleton<ViewModels.Lab.CalibratorViewModel>();
+            services.AddSingleton<ViewModels.Lab.DpcMonitorViewModel>();
             services.AddSingleton<ViewModels.Lab.PingViewModel>();
             services.AddSingleton<ViewModels.Lab.LabViewModel>();
             services.AddSingleton<LabPage>();
@@ -111,6 +114,7 @@ public partial class App
     private async void OnStartup(object sender, StartupEventArgs e)
     {
         AppPaths.EnsureCreated();
+        HeliosToolkit.App.Services.Lab.DpcMonitorService.CleanupStaleSession();
         await AppHost.StartAsync();
 
         bool trayMode = e.Args.Contains("--tray", StringComparer.OrdinalIgnoreCase);
