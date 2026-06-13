@@ -20,7 +20,7 @@ the Acer Predator Helios Neo 16S AI (PHN16S-71)**
 
 ## 📥 Download
 
-**Current build (v0.2.0):** [`release/HeliosToolkit.exe`](release/HeliosToolkit.exe) — open it
+**Current build (v1.0.0):** [`release/HeliosToolkit.exe`](release/HeliosToolkit.exe) — open it
 and click **Download raw file**. Single self-contained EXE, nothing to install.
 Checksum: [`release/HeliosToolkit.exe.sha256`](release/HeliosToolkit.exe.sha256).
 
@@ -36,8 +36,15 @@ Once GitHub Actions runs on this account, tagged builds publish automatically to
 
 ## ✨ Features
 
+- **Lab** *(measure, don't guess)* — **Timer Resolution Calibrator** that benchmarks your machine's
+  optimal sub-millisecond timer value; a built-in **DPC/ISR latency monitor** that names the driver
+  causing micro-stutter; an **Intel PresentMon FPS/frame-time benchmark** with A/B compare that shows
+  which tweaks actually moved the needle; and a ping/jitter test.
+- **Game Boost** *(one click)* — calibrated timer hold + Ultimate power plan + Do Not Disturb + a
+  curated kill-list, with optional **autopilot** (auto-boost when your game launches, restore on exit)
+  and optional **P-core pinning** for the 275HX. Crash-safe: it always restores.
 - **Dashboard** — verifies your machine is a PHN16S-71 and shows CPU / GPU / RAM / NVMe /
-  240 Hz display / OS cards plus a driver-health score.
+  240 Hz display / OS cards plus a driver-health score and the Game Boost tile.
 - **Devices & Drivers** — scans every PnP device, pins broken or driverless devices to the top
   with plain-English problem descriptions, checks the GPU driver against **NVIDIA's official
   lookup API** and the rest against a **curated driver manifest for this exact laptop**
@@ -61,20 +68,17 @@ Once GitHub Actions runs on this account, tagged builds publish automatically to
 
 ## 🗺️ Roadmap
 
-- [x] **Driver fixing via Windows Update** *(v0.2.0)* — finds drivers for problem devices,
-      multiselect, silent install, plus per-device Microsoft Update Catalog links and a
-      pnputil "install from folder" for manual downloads.
-- [x] **NVIDIA driver-profile automation** *(v0.2.0)* — one-click NVAPI bundle: Prefer maximum
-      performance, threaded optimization, V-Sync off, pre-rendered frames 1, texture filtering
-      high-performance. Fully revertible; degrades gracefully if NVAPI refuses.
-- [x] **CPU & SSD tweak pack** *(v0.2.0)* — min processor state, EPP performance bias, C-state
-      control (risky, labeled), NVMe idle, NTFS last-access/8.3, TRIM check.
-- [x] **Tray mode** *(v0.2.0)* — minimize to tray; the 0.5 ms timer hold keeps running.
-- [x] **In-app auto-update** *(v0.2.0)* — download & swap new releases from Settings.
+- [x] **Driver fixing via Windows Update** *(v0.2.0)*
+- [x] **NVIDIA driver-profile automation (NVAPI)** *(v0.2.0)*
+- [x] **CPU & SSD tweak pack** *(v0.2.0)*
+- [x] **Tray mode & in-app auto-update** *(v0.2.0)*
+- [x] **Timer Resolution Calibrator** *(v1.0.0)*
+- [x] **DPC/ISR latency monitor** *(v1.0.0)*
+- [x] **PresentMon FPS/frametime benchmark with A/B compare** *(v1.0.0)*
+- [x] **Game Boost + autopilot + P-core pinning** *(v1.0.0)*
+- [x] **Network latency pack** *(v1.0.0)*
 - [ ] **Acer support-page integration** — auto-fill "latest version" in the driver manifest from
       Acer's official PHN16S-71 download listings (planned as a repo-side updater action).
-- [ ] **Before/after benchmark helper** — PresentMon-based FPS + frame-time capture so every
-      tweak can be measured instead of guessed.
 - [ ] **Code signing** — no more SmartScreen warning.
 - [ ] **More Predator models** — additional curated manifests (Helios 16/18, Neo 14…).
 - [ ] **Localization** — German and more.

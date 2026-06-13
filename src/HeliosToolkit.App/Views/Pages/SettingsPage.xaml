@@ -91,6 +91,123 @@
           </Grid>
         </ui:Card>
 
+        <ui:CardExpander Margin="0,0,0,12" Icon="{ui:SymbolIcon Rocket24}">
+          <ui:CardExpander.Header>
+            <StackPanel>
+              <TextBlock FontSize="15" FontWeight="SemiBold" Text="Game Boost configuration" />
+              <TextBlock
+                Margin="0,3,0,0"
+                FontSize="12.5"
+                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                Text="Pick which games trigger autopilot and which background apps Boost closes." />
+            </StackPanel>
+          </ui:CardExpander.Header>
+
+          <StackPanel Margin="0,4,0,0">
+            <StackPanel Orientation="Horizontal">
+              <ComboBox
+                Width="300"
+                Margin="0,0,8,0"
+                ItemsSource="{Binding ViewModel.RunningProcesses}"
+                SelectedItem="{Binding ViewModel.SelectedProcess}" />
+              <ui:Button
+                Margin="0,0,8,0"
+                Command="{Binding ViewModel.RefreshProcessListCommand}"
+                Content="Refresh"
+                Icon="{ui:SymbolIcon ArrowSync24}" />
+            </StackPanel>
+            <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
+              <ui:Button
+                Margin="0,0,8,0"
+                Command="{Binding ViewModel.AddWatchedGameCommand}"
+                Content="Add as watched game"
+                Icon="{ui:SymbolIcon Games24}" />
+              <ui:Button
+                Command="{Binding ViewModel.AddToKillListCommand}"
+                Content="Add to kill-list"
+                Icon="{ui:SymbolIcon DismissCircle24}" />
+            </StackPanel>
+
+            <TextBlock Margin="0,14,0,4" FontWeight="SemiBold" Text="Watched games (autopilot)" />
+            <ItemsControl ItemsSource="{Binding ViewModel.WatchedGames}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Margin="0,0,0,4" Padding="10,6" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+                      <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding ExeName}" />
+                      <CheckBox
+                        Grid.Column="1"
+                        Margin="0,0,10,0"
+                        VerticalAlignment="Center"
+                        Content="Pin to P-cores"
+                        IsChecked="{Binding PinToPCores, Mode=TwoWay}" />
+                      <ui:Button
+                        Grid.Column="2"
+                        Command="{Binding DataContext.ViewModel.RemoveWatchedGameCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                        CommandParameter="{Binding}"
+                        Icon="{ui:SymbolIcon DeleteDismiss24}" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock Margin="0,14,0,4" FontWeight="SemiBold" Text="Kill-list (closed on Boost, restarted after)" />
+            <ItemsControl ItemsSource="{Binding ViewModel.KillList}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Margin="0,0,0,4" Padding="10,6" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+                      <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="12" Text="{Binding}" TextTrimming="CharacterEllipsis" />
+                      <ui:Button
+                        Grid.Column="1"
+                        Command="{Binding DataContext.ViewModel.RemoveFromKillListCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                        CommandParameter="{Binding}"
+                        Icon="{ui:SymbolIcon DeleteDismiss24}" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock
+              Margin="0,6,0,0"
+              FontSize="11"
+              Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+              Text="Boost asks apps to close first, then force-closes after 5 s — save your work. Closed apps restart (de-elevated) when you un-Boost."
+              TextWrapping="Wrap" />
+          </StackPanel>
+        </ui:CardExpander>
+
+        <ui:Card Margin="0,0,0,12" Padding="20">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+              <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Hold timer at logon" />
+              <TextBlock
+                Margin="0,4,0,0"
+                Style="{StaticResource PageSubtitleTextStyle}"
+                Text="{Binding ViewModel.LogonTaskLabel, Mode=OneWay}" />
+            </StackPanel>
+            <ui:ToggleSwitch
+              Grid.Column="1"
+              VerticalAlignment="Center"
+              Command="{Binding ViewModel.ToggleLogonTaskCommand}"
+              IsChecked="{Binding ViewModel.LogonTaskInstalled, Mode=OneWay}" />
+          </Grid>
+        </ui:Card>
+
         <ui:Card Padding="20">
           <Grid>
             <Grid.ColumnDefinitions>

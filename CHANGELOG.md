@@ -3,6 +3,39 @@
 All notable changes to **Helios Neo Toolkit** are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/) and versions follow [SemVer](https://semver.org/).
 
+## [1.0.0] — 2026-06-13 — "The Lab Update"
+
+A major release focused on measuring and proving performance, plus one-click optimization.
+
+### Added
+- **Lab page** with four tools:
+  - **Timer Resolution Calibrator** — sweeps requested timer values 0.5000→0.5100 ms in 0.0002 ms
+    steps on a TIME_CRITICAL P-core-pinned thread, measures real Sleep(1) wake-up latency + jitter,
+    and finds your machine's optimum (often ~0.503–0.504 ms). Honesty rule keeps 0.5000 when the win
+    is inside the noise. One click applies it everywhere (tweak, tray, logon task); hand-drawn chart.
+  - **DPC / ISR latency monitor** — a real-time kernel ETW trace (LatencyMon, built in) that names the
+    driver causing micro-stutter, with green/yellow/red verdicts and plain-language fix advice.
+  - **FPS / frame-time benchmark** — Intel PresentMon capture (downloaded on demand, checksum-pinned)
+    with avg / 1% low / 0.1% low, and an **A/B compare** that lists exactly which tweaks differed
+    between two runs — so every tweak is proven, not guessed.
+  - **Ping & jitter test** — quick connection check to pair with the network tweaks.
+- **Game Boost** (Dashboard tile + tray) — one click: calibrated timer hold + Helios Ultimate power
+  plan + Do Not Disturb + a curated kill-list of background apps (gracefully closed, restarted
+  de-elevated on un-Boost). Crash-safe: session state is persisted before each step and rolled back
+  on next launch if the app dies mid-Boost.
+- **Autopilot** — watches your chosen game exes (WMI process-trace events with a polling fallback) and
+  Boosts/restores automatically, with a 10 s debounce so launcher respawns don't flap.
+- **Per-game P-core pinning** (off by default) — pins a watched game to the 275HX's 8 performance
+  cores with High priority; skips gracefully on anti-cheat-protected processes.
+- **Network latency pack** — three revertible NIC tweaks: interrupt moderation off (standardized
+  *InterruptModeration keyword), Receive Segment Coalescing off, and never-power-down-the-adapter.
+- **Hold timer at logon** — optional task that starts Helios minimized to the tray holding your
+  calibrated timer.
+
+### Notes
+- New dependency: `Microsoft.Diagnostics.Tracing.TraceEvent` (MIT), referenced so its native bits stay
+  out of the single-file bundle.
+
 ## [0.2.0] — 2026-06-11
 
 ### Added

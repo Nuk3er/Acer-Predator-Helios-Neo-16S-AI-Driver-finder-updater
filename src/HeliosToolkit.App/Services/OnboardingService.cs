@@ -35,7 +35,9 @@ public sealed class OnboardingService(
                 "• Every tweak is labeled Safe / Situational / Risky and can be reverted, individually or all at once " +
                 "from the Backup page.\n" +
                 "• Read the descriptions: some famous 'gaming tweaks' do nothing on modern Windows 11, and this tool " +
-                "tells you which.\n\n" +
+                "tells you which.\n" +
+                "• New in 1.0 — the Lab page: calibrate your timer resolution, hunt stutter-causing drivers, " +
+                "benchmark games and A/B your tweaks. The Dashboard's Game Boost button ties it all together.\n\n" +
                 "Want to create a System Restore point right now as a baseline?",
             PrimaryButtonText = "Create restore point",
             CloseButtonText = "Maybe later",
