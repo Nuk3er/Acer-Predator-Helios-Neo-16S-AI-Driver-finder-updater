@@ -88,6 +88,39 @@
     <ScrollViewer Grid.Row="2" Margin="0,16,0,0" Padding="0,0,12,24" VerticalScrollBarVisibility="Auto">
       <StackPanel>
 
+        <!-- Game Boost tile -->
+        <ui:Card Margin="0,0,12,12" Padding="20">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal">
+                <ui:SymbolIcon Margin="0,0,8,0" FontSize="20" Foreground="{StaticResource PredatorAccentBrush}" Symbol="Rocket24" />
+                <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Game Boost" />
+              </StackPanel>
+              <TextBlock
+                Margin="0,6,0,0"
+                MaxWidth="560"
+                Style="{StaticResource CardHintTextStyle}"
+                Text="{Binding ViewModel.Boost.StateLine, Mode=OneWay}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+              <StackPanel Margin="0,0,16,0" VerticalAlignment="Center">
+                <TextBlock HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Autopilot" />
+                <ui:ToggleSwitch IsChecked="{Binding ViewModel.Boost.IsAutopilotOn, Mode=TwoWay}" />
+              </StackPanel>
+              <ui:Button
+                MinWidth="130"
+                Appearance="Primary"
+                Command="{Binding ViewModel.Boost.ToggleBoostCommand}"
+                Content="{Binding ViewModel.Boost.BoostLabel, Mode=OneWay}"
+                Icon="{ui:SymbolIcon Rocket24}" />
+            </StackPanel>
+          </Grid>
+        </ui:Card>
+
         <!-- Health / quick actions hero card -->
         <ui:Card Margin="0,0,12,12" Padding="20">
           <Grid>

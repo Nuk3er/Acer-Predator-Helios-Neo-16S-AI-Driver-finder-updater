@@ -69,6 +69,13 @@ public partial class App
             services.AddSingleton<HeliosToolkit.App.Services.Network.ActiveAdapterService>();
             services.AddSingleton<HeliosToolkit.App.Services.Network.NicTweakFactory>();
             services.AddSingleton<CpuTopologyService>();
+            services.AddSingleton<UltimateSchemeProvider>();
+
+            // Game Boost
+            services.AddSingleton<HeliosToolkit.App.Services.Boost.BoostConfigStore>();
+            services.AddSingleton<HeliosToolkit.App.Services.Boost.BoostController>();
+            services.AddSingleton<HeliosToolkit.App.Services.Boost.GameWatchService>();
+            services.AddSingleton<BoostViewModel>();
 
             // Tweak engine & safety
             services.AddSingleton<TimerResolutionService>();
@@ -119,6 +126,20 @@ public partial class App
         AppPaths.EnsureCreated();
         HeliosToolkit.App.Services.Lab.DpcMonitorService.CleanupStaleSession();
         await AppHost.StartAsync();
+
+        // Roll back any Boost session a previous crash left active.
+        try
+        {
+            if (await AppHost.Services.GetRequiredService<HeliosToolkit.App.Services.Boost.BoostController>()
+                    .RecoverAsync())
+            {
+                Log.Information("Recovered a leftover Boost session");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Boost recovery failed");
+        }
 
         bool trayMode = e.Args.Contains("--tray", StringComparer.OrdinalIgnoreCase);
         Log.Information("Helios Neo Toolkit starting (version {Version}, tray={Tray})",

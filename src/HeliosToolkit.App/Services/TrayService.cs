@@ -10,12 +10,15 @@ namespace HeliosToolkit.App.Services;
 /// timer-resolution hold keeps running while gaming; double-click or "Open" restores.
 /// Closing the window still exits the app — predictable and explicit.
 /// </summary>
-public sealed class TrayService(System.TimerResolutionService timerResolution) : IDisposable
+public sealed class TrayService(
+    System.TimerResolutionService timerResolution,
+    ViewModels.BoostViewModel boost) : IDisposable
 {
     private WinForms.NotifyIcon? _icon;
     private Window? _window;
     private bool _balloonShown;
     private WinForms.ToolStripMenuItem? _holdItem;
+    private WinForms.ToolStripMenuItem? _boostItem;
 
     public void Attach(Window window)
     {
@@ -30,6 +33,14 @@ public sealed class TrayService(System.TimerResolutionService timerResolution) :
 
         var menu = new WinForms.ContextMenuStrip();
         menu.Items.Add("Open Helios Toolkit", null, (_, _) => Restore());
+        _boostItem = new WinForms.ToolStripMenuItem("Game Boost", null, (_, _) =>
+        {
+            if (boost.ToggleBoostCommand.CanExecute(null))
+            {
+                boost.ToggleBoostCommand.Execute(null);
+            }
+        });
+        menu.Items.Add(_boostItem);
         _holdItem = new WinForms.ToolStripMenuItem("Hold timer", null, (_, _) =>
         {
             if (timerResolution.IsHolding)
@@ -48,6 +59,8 @@ public sealed class TrayService(System.TimerResolutionService timerResolution) :
         {
             _holdItem.Checked = timerResolution.IsHolding;
             _holdItem.Text = $"Hold timer ({timerResolution.TargetMs:0.0000} ms)";
+            _boostItem.Checked = boost.IsBoosted;
+            _boostItem.Text = boost.IsBoosted ? "Un-Boost" : "Game Boost";
         };
         _icon.ContextMenuStrip = menu;
         _icon.DoubleClick += (_, _) => Restore();

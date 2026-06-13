@@ -21,11 +21,15 @@ public partial class DashboardViewModel : ObservableObject
 
     public DriverHealthState Health { get; }
 
-    public DashboardViewModel(SystemInfoService systemInfo, INavigationService navigation, DriverHealthState health)
+    public BoostViewModel Boost { get; }
+
+    public DashboardViewModel(
+        SystemInfoService systemInfo, INavigationService navigation, DriverHealthState health, BoostViewModel boost)
     {
         _systemInfo = systemInfo;
         _navigation = navigation;
         Health = health;
+        Boost = boost;
         _ = LoadAsync(refresh: false);
     }
 
